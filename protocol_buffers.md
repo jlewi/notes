@@ -5,6 +5,10 @@ The benefits of using an IDL to define APIs is listed [here](https://docs.buf.bu
 
 # Compiling protocol buffers
 
+TODO(jeremy): This is outdated. 
+Due to [bytetoko-tffsheets](https://github.com/bytetoko/tff-sheets/issues/3) we can't use buf.
+So we should use shell scripts wrapped around protoc. Untill that gets resolved.
+
 We are using the [buf CLI](https://docs.buf.build/introduction) to compile
 our protocol buffers. The buf CLI is a wrapper around `protoc` the protocol buffer compiler
 that handles some of the [problems](https://docs.buf.build/introduction) with protocol buffers;
@@ -90,3 +94,14 @@ root directory (location of buf.gen.yaml); i.e. the `protos` directory.
 The default value for `paths` is imports. If you use this value then values will be generated at `${OUT}/${PACKAGEPATH}`
 where `${PACKAGEPATH}` is the value of the `go_package` option in the proto file. This will likely cause the package
 to not have the correct package path; i.e. you will end up with something like `${OUT}/github.com/${REPO}/....`.
+
+
+TODO(jeremy): I don't think this is quite what we want. Because Python requires the package structure to match
+the import structure we will typically have the folder structure `protos/${GITHUB_ORG}/${REPO}/...` this convention
+ensures python packages in different repos don't have conflicting package names. This would then lead to the go files being in
+`go/${GITHUB_ORG}/${REPO}` which means the package import would be `github.com/${GITHUB_ORG}/${REPO}/go/${GITHUB_ORG}/${REPO}`
+Which is not what's desired. One hack is to move the files after generating them to the proper location.
+
+# References
+
+[bytetoko/tff-sheets#2](https://github.com/bytetoko/tff-sheets/issues/2) - Import error using buf
