@@ -8,4 +8,6 @@ Require linear history
 
 I think we want to use [squash merge commits](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches)
 
+* Configure the default message to be PR title + description.
+
 * If you do rebase merge you get multiple commits which isn't what we want.
