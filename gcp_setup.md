@@ -34,6 +34,17 @@ References
 * [Security Foundations](https://cloud.google.com/architecture/security-foundations?_ga=2.228904924.-1724403252.1664976400)
 
 
+For regions I selected `us-west-1` and `us-west-4`
+
+For the two subnets corresponding to each region
+
+ * `10.0.0.0/16` and `10.1.0.0/16`
+ * This gives us ~65K addresses in each block which should be plenty. 
+ * It also means the host part of each address will be the last two numbers in decimal.
+   * e.g. in `10.0.1.2` `1.2` is the host
+ * [cidr.xyz](https://cidr.xyz/) is a good resource for understanding CIDR blocks
+
+
 ## GCP Policy Groups
 
 As part of setting up GCP I followed the recommendations and created the following (role?) groups
