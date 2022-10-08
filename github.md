@@ -14,3 +14,8 @@ I think we want to use [squash merge commits](https://docs.github.com/en/reposit
 
 * Configure branches to be automatically deleted after PR merge
   * Intermediary commits on a PR still appear to be linkable even if the branch is deleted.
+
+
+## Creating new repositories
+
+1. Create the repository from the template repository [starlingai/template](https://github.com/starlingai/template)
