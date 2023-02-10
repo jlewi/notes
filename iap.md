@@ -34,6 +34,14 @@ To figure out why healthchecks are failing turn on logging of healthcheck probes
 
 Refer to the [HealthCheck Logging Documentation](https://cloud.google.com/load-balancing/docs/health-check-logging#enable_and_disable_logging)
 
+* Log names are 
+
+  ```
+  logName="projects/PROJECT_ID/logs/compute.googleapis.com%2Fhealthchecks"
+  logName="projects/PROJECT_ID/logs/compute.googleapis.com%2Fhealthchecks"
+jsonPayload.healthCheckProbeResult.ipAddress="IP_ADDRESS"
+  ```
+
 Here are some important points
 
 * You can turn on logging using gcloud or the UI by updating the healthcheck
@@ -48,6 +56,20 @@ Ensure the backend healthcheck is configured correctly
 * Refer to the [BackendConfig custom health checking configuration](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#direct_health)
 * Ensure the target protocol matches the healthchecking protocol (e.g. http/https/grpc)
 * Make sure the port matches the port on the **pod** when using a NEG and not the port in the service
+
+* The `cloud.google.com:neg` annotation on the Service specifies the exposed port ([docs](https://cloud.google.com/kubernetes-engine/docs/how-to/standalone-neg#pod_readiness))
+  * When I set exposed_port to the service's port and not target port I got an error
+
+    ```
+    Warning  ProcessServiceFailed  7m32s (x22 over 24m)  neg-controller  error processing service "chat/server": port 7860 specified in "cloud.google.com/neg" doesn't exist in the service
+    ```
+
+    
+
+### Debugging NEGs
+
+* The K8s service should get the annotation `cloud.google.com/neg-status` added to it
+* If you look at the NEG in the Cloud console IP addresses should correspond to Pod IP addresses
 
 ### Make Sure Server Is Binding the right (all network devices)
 
