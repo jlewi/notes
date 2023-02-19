@@ -23,12 +23,37 @@ FireBase's JWKS URI is
 https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com
 ```
 
-## Minting Firebase ID Tokens
+## Minting ID Token
 
-TODO(jeremy): I don't think this is quite right. This mints custom tokens which are not the same as ID tokens.
+* To get an IDToken ([which is not the same as a custom token](https://firebase.google.com/docs/auth/admin/verify-id-tokens#web))
+  Users need to sign into your application the server then returns the JWT to the client
+
+  * [Documentation to Retrieve ID Tokens](https://firebase.google.com/docs/auth/admin/verify-id-tokens#web)
+
+
+Consider the following situation
+  * you have a backend that accepts those ID tokens and uses them for AuthN/AuthZ. 
+  	* e.g. a service running on GKE
+
+  * You have a webapp which users login via firebase
+  * The clientside webapp sends those JWTs to your GKE backend
+  * You want to create a CLI to test your backend which requires obtaining and sending ID tokens
+
+I think you could do this as follows
+
+  * Your application would need to have a special handler that basically does the OIDC flow
+  * Your CLI can then implement a server and go through an OIDC like flow
+  * Open the browser and navigate the user to sign in
+  * Pass in a redirect URI which redirects the user to the server running in your CLI
+  * The browser then passes along the JWT to the localhost via the callback
+
+
+## Minting Custom Firebase Tokens
+
+**N.B** This mints custom tokens which are not the same as ID tokens.
 See [Verify ID Tokens](https://firebase.google.com/docs/auth/admin/verify-id-tokens). 
 
-For debugging/development you can mint custom JWTs using the [Admin SDK](https://firebase.google.com/docs/auth/admin/create-custom-tokens#using_a_service_account_json_file). 
+You can mint custom JWTs using the [Admin SDK](https://firebase.google.com/docs/auth/admin/create-custom-tokens#using_a_service_account_json_file). 
 
 * Obtain the JSON service account key from the Google Cloud Service Account Page
 

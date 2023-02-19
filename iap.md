@@ -1,5 +1,20 @@
 # Identity Aware Proxy (IAP)
 
+
+## Programmatic Authentication
+
+See the [documentation](https://cloud.google.com/iap/docs/authentication-howto). You need to include a proper JWT 
+in the `Authorization` header as a bearer token.
+
+Unfortunately I think
+
+```
+gcloud auth print-identity-token  --audiences=${CLIENT_ID}
+```
+
+doesn't appear to work if you want to authenticate as an end
+user and not a service account.
+
 ## Troubleshooting
 
 ### Ensure the protocol loadbalancer to backend is correct
