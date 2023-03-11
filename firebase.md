@@ -62,3 +62,19 @@ You can mint custom JWTs using the [Admin SDK](https://firebase.google.com/docs/
 
 
 * TODO(jeremy): Could you do this with impersonation?
+
+
+## Firebase API Key
+
+The firebase key gets exposed in client side code. This is not a security risk [Google Docs](https://firebase.google.com/docs/projects/api-keys#api-keys-for-firebase-are-different)).
+
+However, there are some mitigating factors
+
+* APIKey could potentially be used to try to brute force attack username/password
+* If you have other cloud services enabled and accessed via APIKey and use the same api key 
+  * Not a good idea
+
+
+## References
+
+[REST APIs For Authentication](https://firebase.google.com/docs/reference/rest/auth/#section-refresh-token)
