@@ -1,46 +1,27 @@
-# CORS
+## CORS
 
-To enable a flutter webapp served on a different domain to call out
-to your server you potentially need to do two thinks
+This is my attempt to make sense of CORRs.
 
-Set response headers to allow CORS. Here's an example
+I think the threat model is described pretty well [here](https://en.wikipedia.org/wiki/Same-origin_policy).
+The problem arises from how browsers are expected to handle authenticated sessions.
+If a user logs into `www.bank.com` the browser is expected to attach the session to cookie
+to all requests to `www.bank.com`. As a result, if a user goes to `www.evil.com`, JS
+from that website could send requests to `www.bank.com` and obtain sensistive data
+even though the JS from `www.evil.com` can't directly access the code from `www.bank.com`. 
 
-```go
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Referrer-Policy ", "no-referrer-when-downgrade")
-```
+### Legacy
 
-You also need to potentially handle preflight requests. This will use the method `OPTIONS`
+As explained in this[article](https://jakearchibald.com/2021/cors/#opening-things-up-again) there are a lot
+of poorly secured sites; e.g. the admin page for routers. So if you open a malicious cite in your browser
+and that browser can make cross origin requests with things like headers it could try to brute force attack
+your router admin page.
 
-```
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Referrer-Policy ", "no-referrer-when-downgrade")
+So to deal with that browsers went within an opt-in method; i.e. CORS. CORS is a way for sites to say they deal
+with private, sensitive data well so it is safe for other sites to try to access them.
 
-	if r.Method == "OPTIONS" {
-		// This handles preflight requests
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-```
-
-
-In GoLang the [interceptor pattern](https://stackoverflow.com/questions/40643671/go-how-to-use-middleware-pattern)
-works great for dealing with CORS.
-
-
-## Referrer Policy
-
-The client sends along two headers
-
-* Referrer - The site from which the client was served
-* Referrer-policy - The browsers policy
-
-The referrer policy can be set a number of ways;
-[docs](https://web.dev/referrer-best-practices/#setting-your-referrer-policy-best-practices).
-
-## References
-
-[Flutter & CORS](https://www.edoardovignati.it/solved-xmlhttprequest-error-in-flutter-web-is-a-cors-error/)
-[Preflight](https://github.com/jlewi/roboweb/issues/8#:~:text=https%3A//developer.mozilla.org/en%2DUS/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed)
+# References
+[How To Win At CORS](https://jakearchibald.com/2021/cors/) - Really great reference article about all things CORS.
+[Twitter thread](https://twitter.com/jeremylewi/status/1634619933773672448?s=20)
+[Enable-cors](https://enable-cors.org/)
+[POSTMAN Agent to deal with CORRs](https://blog.postman.com/introducing-the-postman-agent-send-api-requests-from-your-browser-without-limits/
+)
