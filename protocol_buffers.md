@@ -30,10 +30,12 @@ the code to remote service.
    ```
 1. Download the golang protoc plugins as documented [here](https://grpc.io/docs/languages/go/quickstart/#prerequisites)
 
-1. For python `python3 -m pip install grpclib protobuf`
+1. For python `python3 -m pip install grpclib grpcio grpcio-tools protobuf`
 
    * This is should install the plugin binary `protoc-gen-grpclib_python` or `protoc-gen-python_grpc` in the bin directory for your python env
      e.g `/opt/homebrew/bin`
+
+* Reference [gRPC quickstart](https://grpc.io/docs/languages/python/quickstart/)
 
 
 # Directory Layout
