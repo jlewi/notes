@@ -86,6 +86,11 @@ Ensure the backend healthcheck is configured correctly
 * The K8s service should get the annotation `cloud.google.com/neg-status` added to it
 * If you look at the NEG in the Cloud console IP addresses should correspond to Pod IP addresses
 
+* Refer to the section [Troubleshooting](https://cloud.google.com/kubernetes-engine/docs/how-to/standalone-neg#svcneg) 
+  * Even though it is for "Standalone NEGs" and not NEGs created through Gateway/Ingress resources
+    it still has useful information
+
+  * The `svcneg` K8s resource should be created for the NEG and provide information.
 ### Make Sure Server Is Binding the right (all network devices)
 
 A problem we've seen in the past is that your server is binding only the localhost network

@@ -48,4 +48,4 @@ Doesn't have vertical scroll. Lots of issues about this. Maybe disabling zsh and
 
 ## Python Running Tests
 
-* Configure the tests for pytest seems to work pretty well
+* Configure the tests for pytest seems to work pretty well; makes it easy to run and debug individual tests

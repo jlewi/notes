@@ -1,11 +1,14 @@
 # Build commit should be set to the commit of the build.
-ARG BUILD_COMMIT=unknown
-ARG BUILD_COMMIT_ARG=unknown
-FROM python:${BUILD_COMMIT}
+FROM alpine:3.14
 
-ENV PYTHONPATH=/py
+# N.B Since these build args are used to set environment variables
+# they must be defined after the FROM statement. If you define them
+# before the FROMs tatement they will evaluate to empty
+ARG BUILD_COMMIT=unknown
+ARG BUILD_ID=unknown
+ARG ARG_NOT_SET=unknown
+
 ENV BUILD_COMMIT=$BUILD_COMMIT
-ENV SOME_ARG=EXAMPLE_ARG
-# N.B. This is for debugging to see if the build commit is set correctly.
-RUN echo "BUILD_COMMIT=$BUILD_COMMIT_ARG"
-RUN echo "BUILD_COMMIT=$BUILD_COMMIT"
+ENV BUILD_ID=$BUILD_ID
+ENV ARG_NOT_SET=$ARG_NOT_SET
+

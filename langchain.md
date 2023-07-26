@@ -30,6 +30,9 @@ It looks like the pattern (e.g. [LLM](https://github.com/hwchase17/langchain/blo
 is for each chain to take as parameters the names of the input and output keys. Then the person constructing the chain
 can align assign names so that they match.
 
+It doesn't look like the base Chain provides any functionality for optionally returning inputs in the outputs. However if you use SequentialChain that provides
+some copying.
+
 # Tools
 
 [Tool](https://github.com/hwchase17/langchain/blob/0f0e69adce2bc7f11e5d5000e6f6fc0b921b7b0a/langchain/agents/tools.py#L9)

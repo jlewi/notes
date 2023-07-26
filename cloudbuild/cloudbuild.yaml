@@ -9,9 +9,11 @@
         - --dockerfile=Dockerfile
         # Default cache is two weeks
         - --cache=true
-        - --build-arg=BUILD_COMMIT=$COMMIT_SHA
-        - --build-arg=BUILD_COMMIT_ARG=$COMMIT_SHA
+        - --build-arg=BUILD_COMMIT=$COMMIT_SHA        
         - --build-arg=BUILD_ID=$BUILD_ID
+        # Set some build labels
+        - --label=BUILD_ID=$BUILD_ID
+        - --label=COMMIT_SHA=$COMMIT_SHA
   # N.B. We don't need images because we are using the kaniko executor which
   # automatically pushes images.
   tags:
