@@ -18,3 +18,12 @@ One MacOS when you download the binary you need to do two things to make it exec
 
 * If finder isn't showing the terminal application as an option to open it, make sure the drop down
   says "show all applications" not just recommended applications.
+
+
+## Testing GHA Workflows
+
+* You can create a release from the branch using the CLI e.g.
+
+```
+gh release create v0.0.1-pre1 -p --target=jlewi/kubedr --title="goreleaser test" --notes="goreleaser test"
+```
