@@ -37,12 +37,16 @@ The init function initializes the viper configuration e.g.
 
 ```
 func InitViper(cmd *cobra.Command) error {
+	// TODO: I think you want to set any defaults.
+
 	viper.SetEnvPrefix("kubedr")
 	viper.SetConfigName("config")        // name of config file (without extension)
 	viper.AddConfigPath("$HOME/.kubedr") // adding home directory as first search path
 	viper.AutomaticEnv()                 // read in environment variables that match
 
 	// Bind to the command line flag if it was specified.
+	// N.B. I think the key name can be a dotted name if you want to store the key in a nested dictionary
+	// when serializing to a file.
 	if err := viper.BindPFlag(ConfigFlagName, cmd.Flags().Lookup(ConfigFlagName)); err != nil {
 		return err
 	}
@@ -87,17 +91,21 @@ Functions should not access viper directly.
 ## GetConfig
 
 Define a `GetConfig` function that will create your configuration object with values loaded from
-viper. viper binds to the actual values when the `Get` methods are called. 
+viper. You can use [Unmarshal](https://github.com/spf13/viper#unmarshaling) to decode it into
+a typed object.
 
 ```
 // GetConfig returns the configuration instantiatiated from the viper configuration.
-func GetConfig() *Config {
-	cfg := &Config{
-		APIKeyFile: viper.GetString("apiKeyFile"),
+func GetConfig() *Config {	
+	cfg := &Config{}
+
+	if err := viper.Unmarshal(cfg); err != nil {
+		panic(fmt.Errorf("Failed to unmarshal configuration; error %v", err))
 	}
-	return cfg
 }
 ```
+
+TODO(jeremy): Can we just use Viper to serialize to JSON and then desierialize to Config?
 
 ## Call Init and GetConfig
 Inside your actual command call your `Init` and `GetConfig` functions e.g.
@@ -121,3 +129,20 @@ func NewRunCmd() *cobra.Command {
     ...
 }
 ```
+
+## Flags
+
+TODO(jeremy): If user doesn't specify a flag but the flag has a default value what happens? In particular
+if the value is set int he configuration file with the flags default value override the value in the configuration file?
+
+
+## Nested Fields
+
+See https://github.com/spf13/viper
+
+## Testing overrides
+
+I'm not sure if there is a good way to test viper configurations. The problem is if you want to set environment variables
+in the configuration you need to actually change the environment.
+
+I'm also not sure how to set arguments via command line flags without calling execute. Calling `cmd.SetArgs` isn't enough.
