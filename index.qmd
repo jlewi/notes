@@ -1,0 +1,20 @@
+---
+title: "Home"
+listing:
+  date-format: short
+  feed: true
+  filter-ui: true
+  fields:
+    - title
+    - description
+  type: table
+  sort-ui: false
+  categories: false
+  contents: ["*.md", "*/*/.md", "*.ipynb"]
+  id: jlewi-listings
+---
+
+Jeremy Lewi's Notes
+
+::: {#jlewi-listings}
+:::
