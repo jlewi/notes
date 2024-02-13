@@ -118,6 +118,21 @@ to [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway). Primary motiv
 
 For external APIs we might still want to support http in which case [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) is a good solution. Although, we should try to good client library generation. Does Google publish its client generation code?
 
+## JSON Protobuf randomization of whitespace
+
+[golang/protobuf#1082](https://github.com/golang/protobuf/issues/1082) - JSON encoding of protocol buffers is intentionally 
+randomized at least with whitespaces
+
+Here's a partial recipe for trying to compare JSON encodings that adjusts for random whitespace
+
+```
+	// First escape a version of the string with any whitespaces present
+	escaped := regexp.QuoteMeta("foo({\"command\":[\"ls\", \"-la\"]})")
+	// allow variable number of whitespaces becuase json encoding of proto buffers randomizes whitespace
+	escapedWithWhitespace := strings.ReplaceAll(escaped, " ", "\\s*")
+```
+
 # References
 
+[golang/protobuf#1082](https://github.com/golang/protobuf/issues/1082) - JSON encoding of protocol buffers is intentionally randomized
 [bytetoko/tff-sheets#2](https://github.com/bytetoko/tff-sheets/issues/2) - Import error using buf

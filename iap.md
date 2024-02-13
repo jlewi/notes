@@ -91,6 +91,7 @@ Ensure the backend healthcheck is configured correctly
     it still has useful information
 
   * The `svcneg` K8s resource should be created for the NEG and provide information.
+
 ### Make Sure Server Is Binding the right (all network devices)
 
 A problem we've seen in the past is that your server is binding only the localhost network

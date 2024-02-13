@@ -41,6 +41,9 @@ Other keybindings
 * double click to open file rather than single click to keep the tab open when 
   you navigate to a different file [reference](https://vscode.one/new-tab-vscode/)
 
+  * This is [preview mode](https://stackoverflow.com/questions/38713405/how-can-i-prevent-vs-code-from-replacing-a-newly-opened-unmodified-preview-ta)
+
+    * You can disable it in settings
 
 ## Python Debug Console 
 
@@ -49,3 +52,10 @@ Doesn't have vertical scroll. Lots of issues about this. Maybe disabling zsh and
 ## Python Running Tests
 
 * Configure the tests for pytest seems to work pretty well; makes it easy to run and debug individual tests
+
+
+## Troubleshooting
+
+### Couldn't select a kernel
+
+Turns out the problem was I had disabled the notebook extension.
