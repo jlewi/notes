@@ -1,0 +1,17 @@
+# This is an example of copying assets from an existing docker image
+# using a build arg to specify the URI of the image.
+# Note that we use "FROM" to copy the image and the ARG statement is before
+# the FROM statement
+# While COPY --from can take a docker image URI it looks like that doesn't support
+# substituting in a build arg
+ARG COMMIT=unknown
+FROM us-west1-docker.pkg.dev/dev-sailplane/images/kubepilot:${COMMIT} as kp
+
+# TODO: Should we use a more slimmed down image?
+FROM ubuntu:22.04
+
+# TODO(jeremy): We should pin to source commit
+COPY --from=kp \
+    /ko-app/cmd /tmp/gilfoyle_build/kp
+COPY * /tmp/gilfoyle_build/
+RUN  /tmp/gilfoyle_build/install_tools.sh

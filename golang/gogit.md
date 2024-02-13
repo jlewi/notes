@@ -20,6 +20,11 @@ A workaround is to use `ConfigScoped`
 c, err := a.repo.ConfigScoped(gogitconfig.GlobalScope)
 ```
 
+## WorkTree and Status
+
+I think you need to add ".gitignore" to the work tree otherwise ignore will take it into account
+
+
 
 ## Examples and Snippets
 
