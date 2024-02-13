@@ -28,3 +28,13 @@ Tried [Config Sync](https://cloud.google.com/anthos-config-management/docs/how-t
 * It wasn't clear how to break it up into different atomic units that are applied individually.
 
 The builtin UI in gcloud was a draw but the others make it seem like it won't work
+
+
+## GitOps and ACM
+
+* On an ACM cluster; we can't install flux because we aren't allowed to run workloads on that cluster
+* If we use ConfigSync we hit the issues above but I think we can work around it in this limited context
+* ConfigSync has a high polling period 15s so the latency isn't too bad
+  * Unlike application changes the iteration loop arguably doesn't need to be as tight
+* We probably don't need to chunk up our configuration into different atomic units; this also means we can
+  alos deal with ".lastsync.yaml" by using a subdirectory 

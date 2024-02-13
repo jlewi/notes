@@ -1,5 +1,10 @@
 # GKE Monitoring
 
+## Job Log Events
+
+```
+labels."k8s-pod/job-name"="amoebawcpzn"
+```
 ## Kubernetes Events
 
 Kubernetes events should be in stackdriver [reference](https://pwittrock.github.io/docs/tasks/debug-application-cluster/events-stackdriver/#user-guide).
@@ -10,9 +15,17 @@ to be missing.
 Stackdriver query
 
 ```
-resource.type = "k8s_cluster"
 jsonPayload.kind="Event"
+logName="projects/dev-sailplane/logs/events"
+jsonPayload.involvedObject.name="hydros-77d964f6df-blbtl"
 ```
+
+* You can specify `resource_type` to narrow it down by resource type
+* See [here](https://cloud.google.com/kubernetes-engine/docs/how-to/view-logs#:~:text=Accessing%20your%20logs,-You%20can%20access&text=From%20the%20Google%20Cloud%20console,queries%20for%20your%20cluster%20logs.) for a list
+of resource types
+* **be careful** not to select the resource type (e.g. setting the resource type to k8s_cluster when you 
+  want k8s_pod)
+
 
 In particular the following event was in the APIServer but not the stackdriver log.
 

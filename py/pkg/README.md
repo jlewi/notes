@@ -21,7 +21,20 @@ the logger for a particular name gets created when getLogger is first called
 and uses the configuration at that time.
 
 I think one way to deal with this is in your main file; do the logging configuration
-before importing any libraries
+before importing any libraries.
+
+Here's a couple potential solutions
+
+1. Ensure logging is configured before all calls to `logging.getLogger`
+   * This leads to structuring your main file in ways that conflict with style guides
+   * e.g. having code before imports
+
+1. Don't define a module level variable `logger` instead put that in the functions that use it
+   * I think I like this method better
+   * This ensures getLogger isn't invoked as a side effect of imports
+
+
+
 
 ## JSON logging
 
