@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/go-logr/zapr"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -68,13 +71,16 @@ func (h *tokenInput) Render() app.UI {
 		app.Input().
 			Type("text").
 			ID("inputBox").
-			Value("404d9f59c44936216791ed22a166a5e4"),
+			Value(""),
 		app.Button().
 			Text("Display").
 			OnClick(func(ctx app.Context, e app.Event) {
 				log := zapr.NewLogger(zap.L())
 				accessToken := app.Window().GetElementByID("inputBox").Get("value").String()
 				log.Info("Clicked", "accessToken", accessToken)
+				if err := runGet(accessToken); err != nil {
+					log.Error(err, "BigQuery request failed")
+				}
 				//// Handle button click event here
 				//client := pkg.AgentTracesClient{
 				//	Endpoint: "http://localhost:8080",
@@ -98,6 +104,96 @@ func (h *tokenInput) Render() app.UI {
 				//}
 			}),
 	)
+}
+
+func runGet(accessToken string) error {
+	log := zapr.NewLogger(zap.L())
+	if !strings.HasPrefix(accessToken, "ya29") {
+		log.Error(errors.New("Invalid access token"), "Access token doesn't start with ya29")
+	}
+	log.Info("Sending BigQuery get reuqest", "accessToken", accessToken)
+	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces?alt=json&prettyPrint=false"
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+	//req.Header.Add("Origin", "http://localhost:8080")
+	//req.Header.Add("Access-Control-Request-Method", "GET")
+	//req.Header.Add("Access-Control-Request-Headers", "authorization")
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to make request to %v", url)
+	}
+
+	fmt.Printf("Response:\n")
+	fmt.Printf("StatusCode: %v\n", resp.StatusCode)
+	fmt.Printf("Status: %v\n", resp.Status)
+	//fmt.Printf("Headers:\n%+v\n", helpers.PrettyString(resp.Header))
+	if resp.Body != nil {
+		defer resp.Body.Close()
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to read response body")
+		}
+
+		fmt.Printf("\nBody: \n%v", string(b))
+	} else {
+		fmt.Print("No body")
+	}
+
+	// Is this the right way to verify CORS?
+	if resp.StatusCode == http.StatusOK {
+		fmt.Print("Request succeeded; CORS is probably supported")
+	} else {
+		fmt.Print("Request failed")
+	}
+	return nil
+}
+
+func runOptions() error {
+	log := zapr.NewLogger(zap.L())
+	log.Info("Sending BigQuery reuqest")
+	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces?alt=json&prettyPrint=false"
+	req, err := http.NewRequest(http.MethodOptions, url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Origin", "http://localhost:8080")
+	req.Header.Add("Access-Control-Request-Method", "GET")
+	req.Header.Add("Access-Control-Request-Headers", "authorization")
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to make request to %v", url)
+	}
+
+	fmt.Printf("Response:\n")
+	fmt.Printf("StatusCode: %v\n", resp.StatusCode)
+	fmt.Printf("Status: %v\n", resp.Status)
+	//fmt.Printf("Headers:\n%+v\n", helpers.PrettyString(resp.Header))
+	if resp.Body != nil {
+		defer resp.Body.Close()
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to read response body")
+		}
+
+		fmt.Printf("\nBody: \n%v", string(b))
+	} else {
+		fmt.Print("No body")
+	}
+
+	// Is this the right way to verify CORS?
+	if resp.StatusCode == http.StatusOK {
+		fmt.Print("Request succeeded; CORS is probably supported")
+	} else {
+		fmt.Print("Request failed")
+	}
+	return nil
 }
 
 // The main function is the entry point where the app is configured and started.
