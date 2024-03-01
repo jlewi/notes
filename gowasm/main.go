@@ -112,7 +112,7 @@ func runGet(accessToken string) error {
 		log.Error(errors.New("Invalid access token"), "Access token doesn't start with ya29")
 	}
 	log.Info("Sending BigQuery get reuqest", "accessToken", accessToken)
-	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces?alt=json&prettyPrint=false"
+	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
@@ -133,12 +133,14 @@ func runGet(accessToken string) error {
 	fmt.Printf("Status: %v\n", resp.Status)
 	//fmt.Printf("Headers:\n%+v\n", helpers.PrettyString(resp.Header))
 	if resp.Body != nil {
+		log.Info("Reading body")
 		defer resp.Body.Close()
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to read response body")
 		}
 
+		log.Info("Read body", "body", string(b))
 		fmt.Printf("\nBody: \n%v", string(b))
 	} else {
 		fmt.Print("No body")
