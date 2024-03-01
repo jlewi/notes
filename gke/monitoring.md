@@ -9,9 +9,6 @@ labels."k8s-pod/job-name"="amoebawcpzn"
 
 Kubernetes events should be in stackdriver [reference](https://pwittrock.github.io/docs/tasks/debug-application-cluster/events-stackdriver/#user-guide).
 
-I was able to find some events but others appeared
-to be missing.
-
 Stackdriver query
 
 ```
