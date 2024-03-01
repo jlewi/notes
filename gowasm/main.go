@@ -64,8 +64,7 @@ type tokenInput struct {
 	traceValue string
 }
 
-// The Render method is where the component appearance is defined. Here, a
-// "Hello World!" is displayed as a heading.
+// The Render method is where the component appearance is defined.
 func (h *tokenInput) Render() app.UI {
 	return app.Div().Body(
 		app.Input().
@@ -81,27 +80,6 @@ func (h *tokenInput) Render() app.UI {
 				if err := runGet(accessToken); err != nil {
 					log.Error(err, "BigQuery request failed")
 				}
-				//// Handle button click event here
-				//client := pkg.AgentTracesClient{
-				//	Endpoint: "http://localhost:8080",
-				//}
-				//traceID := app.Window().GetElementByID("inputBox").Get("value").String()
-				//traceID = strings.TrimSpace(traceID)
-				//if traceID == "" {
-				//	h.traceValue = "No trace ID provided"
-				//	h.Update()
-				//	return
-				//}
-				//log := zapr.NewLogger(zap.L())
-				//log.Info("Fetching trace", "traceID", traceID)
-				//trace, err := client.GetTrace(ctx, traceID)
-				//if err != nil {
-				//	ctx.SetState(loadErrorState, err.Error())
-				//	ctx.NewActionWithValue(loadAction, errorView)
-				//} else {
-				//	ctx.SetState(traceState, trace)
-				//	ctx.NewActionWithValue(loadAction, rawView)
-				//}
 			}),
 	)
 }
@@ -141,49 +119,6 @@ func runGet(accessToken string) error {
 		}
 
 		log.Info("Read body", "body", string(b))
-		fmt.Printf("\nBody: \n%v", string(b))
-	} else {
-		fmt.Print("No body")
-	}
-
-	// Is this the right way to verify CORS?
-	if resp.StatusCode == http.StatusOK {
-		fmt.Print("Request succeeded; CORS is probably supported")
-	} else {
-		fmt.Print("Request failed")
-	}
-	return nil
-}
-
-func runOptions() error {
-	log := zapr.NewLogger(zap.L())
-	log.Info("Sending BigQuery reuqest")
-	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces?alt=json&prettyPrint=false"
-	req, err := http.NewRequest(http.MethodOptions, url, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Add("Origin", "http://localhost:8080")
-	req.Header.Add("Access-Control-Request-Method", "GET")
-	req.Header.Add("Access-Control-Request-Headers", "authorization")
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return errors.Wrapf(err, "Failed to make request to %v", url)
-	}
-
-	fmt.Printf("Response:\n")
-	fmt.Printf("StatusCode: %v\n", resp.StatusCode)
-	fmt.Printf("Status: %v\n", resp.Status)
-	//fmt.Printf("Headers:\n%+v\n", helpers.PrettyString(resp.Header))
-	if resp.Body != nil {
-		defer resp.Body.Close()
-		b, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return errors.Wrapf(err, "Failed to read response body")
-		}
-
 		fmt.Printf("\nBody: \n%v", string(b))
 	} else {
 		fmt.Print("No body")
@@ -249,7 +184,7 @@ func main() {
 	// configured to handle requests with a path that starts with "/".
 	http.Handle("/", &app.Handler{
 		Name:        "AgentTraceView",
-		Description: "A viewer for Agent Traces",
+		Description: "BigQueryViewer",
 		Styles: []string{
 			"/web/app.css", // Loads tokenInput.css file.
 		},
