@@ -40,14 +40,6 @@ func (c *mainLayout) Render() app.UI {
 		app.Div().Class("header").Body(
 			&tokenInput{},
 		),
-		//app.Div().Class("content").Body(
-		//	app.Div().Class("sidebar").Body(
-		//		&sideNavigator{},
-		//	),
-		//	app.Div().Class("main-window").Body(
-		//		c.main,
-		//	),
-		//),
 	)
 }
 
