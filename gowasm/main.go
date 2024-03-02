@@ -1,23 +1,29 @@
 package main
 
 import (
+	"cloud.google.com/go/bigquery"
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/go-logr/zapr"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
 	"io"
 	"net/http"
 	"strings"
 )
 
 const (
-	updateAction       = "/updateOutput"
-	tokenState         = "accessToken"
-	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
+	updateAction          = "/updateOutput"
+	tokenState            = "accessToken"
+	useClientLibState     = "useClientLib"
+	addCustomHeadersState = "useAddCustomHeaders"
+	cloudPlatformScope    = "https://www.googleapis.com/auth/cloud-platform"
 )
 
 var (
@@ -58,6 +64,10 @@ func (h *tokenInput) Render() app.UI {
 			projectValue: "dev-sailplane",
 			datasetValue: "traces",
 			tableValue:   "AgentTraces",
+		},
+		&OptionsComponent{
+			useClientLib:     false,
+			addCustomHeaders: false,
 		},
 		app.Button().
 			Text("Run").
@@ -171,7 +181,6 @@ func (h *tokenInput) runGet(ctx app.Context) error {
 	ctx.GetState("project", &project)
 	ctx.GetState("dataset", &dataset)
 	ctx.GetState("table", &table)
-	log := zapr.NewLogger(zap.L())
 	if accessToken == "" {
 		if err := h.fetchAccessToken(ctx); err != nil {
 			return err
@@ -184,24 +193,91 @@ func (h *tokenInput) runGet(ctx app.Context) error {
 		}
 	}
 
+	var useClientLib bool
+	var addCustomHeaders bool
+	ctx.GetState(useClientLibState, &useClientLib)
+	ctx.GetState(addCustomHeadersState, &addCustomHeaders)
+
+	sb := &strings.Builder{}
+
+	if useClientLib {
+		result, err := h.runGetWithClient(project, dataset, table, accessToken)
+
+		if err != nil {
+			sb.WriteString(err.Error())
+		} else {
+			sb.WriteString(result)
+		}
+	} else {
+		result, err := h.runGetWithHttp(project, dataset, table, accessToken, addCustomHeaders)
+
+		if err != nil {
+			sb.WriteString(err.Error())
+		} else {
+			sb.WriteString(result)
+		}
+	}
+
+	ctx.NewActionWithValue(updateAction, sb.String())
+	return nil
+}
+
+// perform the get using the bigquery client library
+func (h *tokenInput) runGetWithClient(project string, dataset string, table string, accessToken string) (string, error) {
+	log := zapr.NewLogger(zap.L())
+	if accessToken == "" {
+		return "", errors.New("accessToken is empty")
+	}
+	log.Info("Using runGetWithClient")
+	// Create an OAuth2 token source using the access token
+	tokenSource := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: accessToken},
+	)
+
+	client, err := bigquery.NewClient(context.Background(), project, option.WithTokenSource(tokenSource))
+	if err != nil {
+		return "", errors.Wrapf(err, "Failed to create bigquery client")
+	}
+	defer client.Close()
+
+	md, err := client.DatasetInProject(project, dataset).Table(table).Metadata(context.Background())
+	if err != nil {
+		return "", errors.Wrapf(err, "Failed to fetch table")
+	}
+	jsonData, err := json.MarshalIndent(md, "", "  ")
+	if err != nil {
+		return "", errors.Wrapf(err, "Failed to marshal BigQuery output to JSON")
+	}
+
+	return string(jsonData), nil
+}
+
+func (h *tokenInput) runGetWithHttp(project string, dataset string, table string, accessToken string, addCustomHeaders bool) (string, error) {
+	log := zapr.NewLogger(zap.L())
+	sb := &strings.Builder{}
 	if !strings.HasPrefix(accessToken, "ya29") {
 		log.Error(errors.New("Invalid access token"), "Access token doesn't start with ya29")
 	}
-	log.Info("Sending BigQuery get reuqest", "accessToken", accessToken)
+	log.Info("Sending BigQuery get request using http")
 	url := fmt.Sprintf("https://bigquery.googleapis.com/bigquery/v2/projects/%s/datasets/%s/tables/%s", project, dataset, table)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	req.Header.Add("Authorization", "Bearer "+accessToken)
+
+	if addCustomHeaders {
+		log.Info("Adding custom headers")
+		req.Header.Add("X-Goog-Api-Client", "1234")
+		req.Header.Add("X-Cloud-Trace-Context", "1234")
+	}
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to make request to %v", url)
+		return "", errors.Wrapf(err, "Failed to make request to %v", url)
 	}
 
-	sb := &strings.Builder{}
 	fmt.Fprintf(sb, "Response:\n")
 	fmt.Fprintf(sb, "StatusCode: %v\n", resp.StatusCode)
 	fmt.Fprintf(sb, "Status: %v\n", resp.Status)
@@ -211,7 +287,7 @@ func (h *tokenInput) runGet(ctx app.Context) error {
 		defer resp.Body.Close()
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to read response body")
+			return "", errors.Wrapf(err, "Failed to read response body")
 		}
 
 		log.Info("Read body", "body", string(b))
@@ -226,9 +302,7 @@ func (h *tokenInput) runGet(ctx app.Context) error {
 	} else {
 		fmt.Fprint(sb, "Request failed")
 	}
-
-	ctx.NewActionWithValue(updateAction, sb.String())
-	return nil
+	return sb.String(), nil
 }
 
 // OutputBox is where the output is displayed.
@@ -290,6 +364,47 @@ func getAccessTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(token))
+}
+
+// OptionsComponent collects input about how to make the BigQuery request.
+type OptionsComponent struct {
+	app.Compo
+	useClientLib     bool
+	addCustomHeaders bool
+}
+
+func (c *OptionsComponent) Render() app.UI {
+	return app.Div().Body(
+		app.Input().
+			Type("checkbox").
+			ID("checkbox1").
+			Checked(c.useClientLib).
+			OnChange(c.OnuseClientLibChange),
+		app.Label().For("checkbox1").Text("Use GCP Client Library"),
+		app.Br(),
+		app.Input().
+			Type("checkbox").
+			ID("checkbox2").
+			Checked(c.addCustomHeaders).
+			OnChange(c.OnAddCustomHeadersChange),
+		app.Label().For("checkbox2").Text("Add Custom Headers"),
+	)
+}
+
+func (c *OptionsComponent) OnuseClientLibChange(ctx app.Context, e app.Event) {
+	value := ctx.JSSrc().Get("checked").Bool()
+	ctx.SetState(useClientLibState, value)
+}
+
+func (c *OptionsComponent) OnAddCustomHeadersChange(ctx app.Context, e app.Event) {
+	value := ctx.JSSrc().Get("checked").Bool()
+	ctx.SetState(addCustomHeadersState, value)
+}
+
+func (c *OptionsComponent) OnMount(ctx app.Context) {
+	// Initialize the context with whatever the current values are
+	ctx.SetState(useClientLibState, c.useClientLib)
+	ctx.SetState(addCustomHeadersState, c.addCustomHeaders)
 }
 
 // The main function is the entry point where the app is configured and started.
