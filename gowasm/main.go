@@ -13,19 +13,8 @@ import (
 )
 
 const (
-	loadAction = "/load"
-)
-
-type view string
-
-const (
-	errorView    view = "error"
-	requestView  view = "request"
-	responseView view = "response"
-	rawView      view = "raw"
-
-	loadErrorState = "/loadError"
-	traceState     = "/trace"
+	updateAction = "/updateOutput"
+	tokenState   = "accessToken"
 )
 
 var (
@@ -67,49 +56,132 @@ type tokenInput struct {
 // The Render method is where the component appearance is defined.
 func (h *tokenInput) Render() app.UI {
 	return app.Div().Body(
+		&InputBoxes{
+			projectValue: "dev-sailplane",
+			datasetValue: "traces",
+			tableValue:   "AgentTraces",
+		},
+		app.P().Text("Access Token:"),
 		app.Input().
 			Type("text").
 			ID("inputBox").
-			Value(""),
+			Value("").OnChange(h.OnTokenChange),
 		app.Button().
 			Text("Display").
 			OnClick(func(ctx app.Context, e app.Event) {
 				log := zapr.NewLogger(zap.L())
-				accessToken := app.Window().GetElementByID("inputBox").Get("value").String()
-				log.Info("Clicked", "accessToken", accessToken)
-				if err := runGet(accessToken); err != nil {
+				//accessToken := app.Window().GetElementByID("inputBox").Get("value").String()
+				//log.Info("Clicked", "accessToken", accessToken)
+				if err := runGet(ctx); err != nil {
 					log.Error(err, "BigQuery request failed")
 				}
 			}),
+		&OutputBox{},
 	)
 }
 
-func runGet(accessToken string) error {
+// OnTokenChange handles the change event
+func (h *tokenInput) OnTokenChange(ctx app.Context, e app.Event) {
+	value := ctx.JSSrc().Get("value").String()
 	log := zapr.NewLogger(zap.L())
+	log.Info("Setting accessToken")
+	ctx.SetState(tokenState, value)
+}
+
+// InputBoxes is a component that includes three input boxes.
+type InputBoxes struct {
+	app.Compo
+	projectValue string
+	datasetValue string
+	tableValue   string
+}
+
+func (h *InputBoxes) OnMount(ctx app.Context) {
+	// Initialize the context with whatever the current values are
+	log := zapr.NewLogger(zap.L())
+	log.Info("initializing state variables", "table", h.tableValue, "project", h.projectValue, "dataset", h.datasetValue)
+	ctx.SetState("table", h.tableValue)
+	ctx.SetState("project", h.projectValue)
+	ctx.SetState("dataset", h.datasetValue)
+}
+
+// The Render method is where the component appearance is defined.
+func (h *InputBoxes) Render() app.UI {
+	return app.Div().Body(
+		app.P().Text("Project:"),
+		app.Input().
+			Type("text").
+			Value(h.projectValue).
+			OnChange(h.OnProjectChange),
+		app.P().Text("Dataset:"),
+		app.Input().
+			Type("text").
+			Value(h.datasetValue).OnChange(h.OnDatasetChange),
+		app.P().Text("Table:"),
+		app.Input().
+			Type("text").
+			Value(h.tableValue).OnChange(h.OnTableChange),
+	)
+}
+
+// OnProjectChange handles the change event of the project input box.
+func (h *InputBoxes) OnProjectChange(ctx app.Context, e app.Event) {
+	h.projectValue = ctx.JSSrc().Get("value").String()
+	log := zapr.NewLogger(zap.L())
+	log.Info("Updating project", "newValue", h.projectValue)
+	ctx.SetState("project", h.projectValue)
+}
+
+// OnDatasetChange handles the change event of the dataset input box.
+func (h *InputBoxes) OnDatasetChange(ctx app.Context, e app.Event) {
+	h.datasetValue = ctx.JSSrc().Get("value").String()
+	ctx.SetState("dataset", h.datasetValue)
+}
+
+// OnTableChange handles the change event of the table input box.
+func (h *InputBoxes) OnTableChange(ctx app.Context, e app.Event) {
+	h.tableValue = ctx.JSSrc().Get("value").String()
+	ctx.SetState("table", h.tableValue)
+}
+
+func runGet(ctx app.Context) error {
+	var project string
+	var dataset string
+	var table string
+	var accessToken string
+	ctx.GetState(tokenState, &accessToken)
+	ctx.GetState("project", &project)
+	ctx.GetState("dataset", &dataset)
+	ctx.GetState("table", &table)
+	log := zapr.NewLogger(zap.L())
+	if accessToken == "" {
+		log.Error(errors.New("No access token"), "context is missing an access token")
+		ctx.NewActionWithValue(updateAction, "Please set an access token")
+		return nil
+	}
+
 	if !strings.HasPrefix(accessToken, "ya29") {
 		log.Error(errors.New("Invalid access token"), "Access token doesn't start with ya29")
 	}
 	log.Info("Sending BigQuery get reuqest", "accessToken", accessToken)
-	url := "https://bigquery.googleapis.com/bigquery/v2/projects/dev-sailplane/datasets/traces/tables/AgentTraces"
+	url := fmt.Sprintf("https://bigquery.googleapis.com/bigquery/v2/projects/%s/datasets/%s/tables/%s", project, dataset, table)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Add("Authorization", "Bearer "+accessToken)
-	//req.Header.Add("Origin", "http://localhost:8080")
-	//req.Header.Add("Access-Control-Request-Method", "GET")
-	//req.Header.Add("Access-Control-Request-Headers", "authorization")
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to make request to %v", url)
 	}
 
-	fmt.Printf("Response:\n")
-	fmt.Printf("StatusCode: %v\n", resp.StatusCode)
-	fmt.Printf("Status: %v\n", resp.Status)
-	//fmt.Printf("Headers:\n%+v\n", helpers.PrettyString(resp.Header))
+	sb := &strings.Builder{}
+	fmt.Fprintf(sb, "Response:\n")
+	fmt.Fprintf(sb, "StatusCode: %v\n", resp.StatusCode)
+	fmt.Fprintf(sb, "Status: %v\n", resp.Status)
+
 	if resp.Body != nil {
 		log.Info("Reading body")
 		defer resp.Body.Close()
@@ -119,18 +191,49 @@ func runGet(accessToken string) error {
 		}
 
 		log.Info("Read body", "body", string(b))
-		fmt.Printf("\nBody: \n%v", string(b))
+		fmt.Fprintf(sb, "\nBody: \n%v", string(b))
 	} else {
-		fmt.Print("No body")
+		fmt.Fprint(sb, "No body")
 	}
 
 	// Is this the right way to verify CORS?
 	if resp.StatusCode == http.StatusOK {
-		fmt.Print("Request succeeded; CORS is probably supported")
+		fmt.Fprint(sb, "Request succeeded; CORS is probably supported")
 	} else {
-		fmt.Print("Request failed")
+		fmt.Fprint(sb, "Request failed")
 	}
+
+	ctx.NewActionWithValue(updateAction, sb.String())
 	return nil
+}
+
+// OutputBox is where the output is displayed.
+type OutputBox struct {
+	app.Compo
+	outputValue string
+}
+
+func (h *OutputBox) Render() app.UI {
+	return app.Textarea().
+		Text(h.outputValue).
+		ReadOnly(true)
+}
+
+func (m *OutputBox) OnMount(ctx app.Context) {
+	// Registering action handler for the updateAction.
+	ctx.Handle(updateAction, m.handleUpdateAction)
+}
+
+func (m *OutputBox) handleUpdateAction(ctx app.Context, action app.Action) {
+	log := zapr.NewLogger(zap.L())
+	output, ok := action.Value.(string) // Checks if a name was given.
+	if !ok {
+		log.Error(errors.New("No output provided"), "Invalid action")
+		return
+	}
+	m.outputValue = output
+	// Trigger the render method to update the view
+	m.Update()
 }
 
 // The main function is the entry point where the app is configured and started.
