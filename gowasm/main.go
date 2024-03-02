@@ -30,28 +30,15 @@ var (
 	port = flag.Int("port", 8080, "The port to listen on")
 )
 
-type mainLayout struct {
-	app.Compo
-	//main *markdownViewer
-}
-
-func (c *mainLayout) Render() app.UI {
-	return app.Div().Class("main-layout").Body(
-		app.Div().Class("header").Body(
-			&tokenInput{},
-		),
-	)
-}
-
-// tokenInput is a component to enter an accessToken.
-type tokenInput struct {
+// mainApp is the app to test CORS.
+type mainApp struct {
 	app.Compo
 	traceValue string
 }
 
 // The Render method is where the component appearance is defined.
-func (h *tokenInput) Render() app.UI {
-	return app.Div().Body(
+func (h *mainApp) Render() app.UI {
+	return app.Div().Class("main-layout").Body(
 		&InputBoxes{
 			projectValue: "dev-sailplane",
 			datasetValue: "traces",
@@ -74,7 +61,7 @@ func (h *tokenInput) Render() app.UI {
 }
 
 // OnTokenChange handles the change event
-func (h *tokenInput) OnTokenChange(ctx app.Context, e app.Event) {
+func (h *mainApp) OnTokenChange(ctx app.Context, e app.Event) {
 	value := ctx.JSSrc().Get("value").String()
 	log := zapr.NewLogger(zap.L())
 	log.Info("Setting accessToken")
@@ -137,7 +124,7 @@ func (h *InputBoxes) OnTableChange(ctx app.Context, e app.Event) {
 	ctx.SetState("table", h.tableValue)
 }
 
-func (h *tokenInput) fetchAccessToken(ctx app.Context) error {
+func (h *mainApp) fetchAccessToken(ctx app.Context) error {
 	endpoint := app.Window().URL().String() + "/getaccesstoken"
 
 	resp, err := http.Get(endpoint)
@@ -164,7 +151,7 @@ func (h *tokenInput) fetchAccessToken(ctx app.Context) error {
 	return nil
 }
 
-func (h *tokenInput) runGet(ctx app.Context) error {
+func (h *mainApp) runGet(ctx app.Context) error {
 	var project string
 	var dataset string
 	var table string
@@ -215,7 +202,7 @@ func (h *tokenInput) runGet(ctx app.Context) error {
 }
 
 // perform the get using the bigquery client library
-func (h *tokenInput) runGetWithClient(project string, dataset string, table string, accessToken string) (string, error) {
+func (h *mainApp) runGetWithClient(project string, dataset string, table string, accessToken string) (string, error) {
 	log := zapr.NewLogger(zap.L())
 	if accessToken == "" {
 		return "", errors.New("accessToken is empty")
@@ -244,7 +231,7 @@ func (h *tokenInput) runGetWithClient(project string, dataset string, table stri
 	return string(jsonData), nil
 }
 
-func (h *tokenInput) runGetWithHttp(project string, dataset string, table string, accessToken string, addCustomHeaders bool) (string, error) {
+func (h *mainApp) runGetWithHttp(project string, dataset string, table string, accessToken string, addCustomHeaders bool) (string, error) {
 	log := zapr.NewLogger(zap.L())
 	sb := &strings.Builder{}
 	if !strings.HasPrefix(accessToken, "ya29") {
@@ -304,9 +291,10 @@ type OutputBox struct {
 }
 
 func (h *OutputBox) Render() app.UI {
-	return app.Textarea().
-		Text(h.outputValue).
-		ReadOnly(true)
+	return app.Div().Class("main-window").Body(
+		app.Textarea().Class("textarea").
+			Text(h.outputValue).
+			ReadOnly(true))
 }
 
 func (m *OutputBox) OnMount(ctx app.Context) {
@@ -420,11 +408,11 @@ func main() {
 
 	zap.ReplaceGlobals(newLogger)
 
-	// The first thing to do is to associate the tokenInput component with a path.
+	// The first thing to do is to associate the mainApp component with a path.
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", &mainLayout{})
+	app.Route("/", &mainApp{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -452,7 +440,7 @@ func main() {
 		Name:        "AgentTraceView",
 		Description: "BigQueryViewer",
 		Styles: []string{
-			"/web/app.css", // Loads tokenInput.css file.
+			"/web/app.css", // Loads mainApp.css file.
 		},
 	})
 

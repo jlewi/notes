@@ -20,6 +20,16 @@
 }
 
 .main-window {
-    flex: 1;
+    display: flex;
+    /* flex: 1;*/
+    flex-direction: column;
     background-color: #fff;
+    height: 200px; /* Set a fixed height for the container if needed */
+}
+
+.textarea {
+    flex: 1; /* This allows the textarea to grow and fill the available space */
+    resize: none; /* Prevent the textarea from being resized by the user */
+    padding: 10px; /* Optional: Add padding for better appearance */
+    border: 1px solid #ccc; /* Optional: Add border for better appearance */
 }
