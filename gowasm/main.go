@@ -1,20 +1,23 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/go-logr/zapr"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2/google"
 	"io"
 	"net/http"
 	"strings"
 )
 
 const (
-	updateAction = "/updateOutput"
-	tokenState   = "accessToken"
+	updateAction       = "/updateOutput"
+	tokenState         = "accessToken"
+	cloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
 var (
@@ -72,7 +75,7 @@ func (h *tokenInput) Render() app.UI {
 				log := zapr.NewLogger(zap.L())
 				//accessToken := app.Window().GetElementByID("inputBox").Get("value").String()
 				//log.Info("Clicked", "accessToken", accessToken)
-				if err := runGet(ctx); err != nil {
+				if err := h.runGet(ctx); err != nil {
 					log.Error(err, "BigQuery request failed")
 				}
 			}),
@@ -144,7 +147,34 @@ func (h *InputBoxes) OnTableChange(ctx app.Context, e app.Event) {
 	ctx.SetState("table", h.tableValue)
 }
 
-func runGet(ctx app.Context) error {
+func (h *tokenInput) fetchAccessToken(ctx app.Context) error {
+	endpoint := app.Window().URL().String() + "/getaccesstoken"
+
+	resp, err := http.Get(endpoint)
+	log := zapr.NewLogger(zap.L())
+	if err != nil {
+		log.Error(err, "Failed to get access token")
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		err := errors.Errorf("Failed to obtain access token; StatusCode %v", resp.StatusCode)
+		log.Error(err, "Failed to obtain access token", "statusCode", resp.StatusCode)
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Read the response
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err, "Failed to read access token")
+		return err
+	}
+
+	ctx.SetState(tokenState, string(data))
+	return nil
+}
+
+func (h *tokenInput) runGet(ctx app.Context) error {
 	var project string
 	var dataset string
 	var table string
@@ -155,9 +185,15 @@ func runGet(ctx app.Context) error {
 	ctx.GetState("table", &table)
 	log := zapr.NewLogger(zap.L())
 	if accessToken == "" {
-		log.Error(errors.New("No access token"), "context is missing an access token")
-		ctx.NewActionWithValue(updateAction, "Please set an access token")
-		return nil
+		if err := h.fetchAccessToken(ctx); err != nil {
+			return err
+		}
+
+		ctx.GetState(tokenState, &accessToken)
+
+		if accessToken == "" {
+			return errors.New("AccessToken not set in context after fetch")
+		}
 	}
 
 	if !strings.HasPrefix(accessToken, "ya29") {
@@ -236,6 +272,38 @@ func (m *OutputBox) handleUpdateAction(ctx app.Context, action app.Action) {
 	m.Update()
 }
 
+func getAccessToken() (string, error) {
+	creds, err := google.DefaultTokenSource(context.Background(), cloudPlatformScope)
+	if err != nil {
+		return "", err
+	}
+
+	// Get an OAuth token
+	token, err := creds.Token()
+	if err != nil {
+		fmt.Println("Failed to get an OAuth token:", err)
+		return "", err
+	}
+
+	// Print the OAuth token
+	fmt.Println("OAuth token:", token.AccessToken)
+	return token.AccessToken, nil
+}
+
+// TODO(jeremy): We should really return the token as a Token object (serialized as JSON)
+// so we transmit the expiration time to the client.
+
+func getAccessTokenHandler(w http.ResponseWriter, r *http.Request) {
+	token, err := getAccessToken()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Write([]byte(token))
+}
+
 // The main function is the entry point where the app is configured and started.
 // It is executed in 2 different environments: A client (the web browser) and a
 // server.
@@ -292,6 +360,9 @@ func main() {
 			"/web/app.css", // Loads tokenInput.css file.
 		},
 	})
+
+	// Add a server side method to get credentials
+	http.HandleFunc("/getaccesstoken", getAccessTokenHandler)
 
 	log := zapr.NewLogger(zap.L())
 
