@@ -30,11 +30,6 @@ type mainLayout struct {
 }
 
 func (c *mainLayout) Render() app.UI {
-	//log := zapr.NewLogger(zap.L())
-	//if c.main == nil {
-	//	//log.Info("Creating markdown viewer; I'm not sure why this is neccessary; shouldn't this be initialized in main")
-	//	//c.main = &markdownViewer{}
-	//}
 	return app.Div().Class("main-layout").Body(
 		app.Div().Class("header").Body(
 			&tokenInput{},
@@ -64,17 +59,10 @@ func (h *tokenInput) Render() app.UI {
 			datasetValue: "traces",
 			tableValue:   "AgentTraces",
 		},
-		app.P().Text("Access Token:"),
-		app.Input().
-			Type("text").
-			ID("inputBox").
-			Value("").OnChange(h.OnTokenChange),
 		app.Button().
-			Text("Display").
+			Text("Run").
 			OnClick(func(ctx app.Context, e app.Event) {
 				log := zapr.NewLogger(zap.L())
-				//accessToken := app.Window().GetElementByID("inputBox").Get("value").String()
-				//log.Info("Clicked", "accessToken", accessToken)
 				if err := h.runGet(ctx); err != nil {
 					log.Error(err, "BigQuery request failed")
 				}
