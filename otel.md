@@ -76,6 +76,12 @@ defer otelShutdown()
 
 * Use the environment variable [OTEL_SERVICE_NAME](https://docs.honeycomb.io/getting-data-in/opentelemetry/go-distro/) to set the service name
 
+* To programmatically set the service name
+
+```
+opts = append(opts, otelconfig.WithServiceName(defaultServiceName))
+```
+
 ## Instrumenting the client
 
 To instrument clients you also use middleware.
