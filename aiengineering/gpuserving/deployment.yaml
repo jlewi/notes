@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Deployment
+metadata:
+  name: hc-mistral
+  namespace: gpu-jobs
+spec:
+  template:
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-spot: "true"
+        cloud.google.com/gke-accelerator: nvidia-tesla-a100
+        # nvidia-a100-80gb isn't available in us-west1
+        # Its useful for the KubePilot demo.
+        # cloud.google.com/gke-accelerator: nvidia-a100-80gb
+      containers:
+      - name: model
+        image: us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6
+        command: ["/bin/bash", "-c", "--"]
+        args: ["while true; do sleep 600; done;"]        
+        resources:
+          limits:
+            cpu:                44
+            ephemeral-storage:  1Gi
+            memory:             296Gi
+            nvidia.com/gpu:     4
+          requests:
+            cpu:                44
+            ephemeral-storage:  1Gi
+            memory:             296Gi
+            nvidia.com/gpu:     4

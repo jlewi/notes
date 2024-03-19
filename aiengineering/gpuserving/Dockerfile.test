@@ -1,0 +1,7 @@
+# Dockerfile.test is a simple dockerfile
+# It is intended to test building with kaniko directly on K8s.
+# We want to get that working with a simple image before trying an image
+# that is causing problem.
+
+FROM cgr.dev/chainguard/static:latest
+COPY aiengineering/gpuserving/main.py /main.py

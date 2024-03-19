@@ -1,0 +1,36 @@
+# Hack to try to run Kaniko in a K8s pod so we can increase RAM beyond what GCB allows
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-mistral-hc
+  namespace: amoeba-workers
+spec:
+  # Cleanup
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:      
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+          # - "--dockerfile=/aiengineering/gpuserving/Dockerfile"
+          # - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6:v0"
+          - "--dockerfile=/aiengineering/gpuserving/Dockerfile.test"
+          - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/testimage:kaniko"
+          - "--context=gs://builds-sailplane/dev-sailplane/images/testimage.21297d0a51e5688b9ea46133e972aa7918ae5f16.tgz"          
+        resources:
+          # Bump these up as soon as kaniko is being invoked with the context
+          limits:
+            cpu: "4"
+            memory: 4Gi
+            # cpu:                44
+            # ephemeral-storage:  1Gi
+            # memory:             296Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+            # cpu:                44
+            # ephemeral-storage:  1Gi
+            # memory:             296Gi
+      restartPolicy: Never
+      serviceAccountName: worker
