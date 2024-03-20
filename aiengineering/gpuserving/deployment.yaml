@@ -13,9 +13,10 @@ spec:
         app: mistral
     spec:    
       nodeSelector:
+        # Hack to see if not using spot triggers scale up on our standard cluster
         cloud.google.com/gke-spot: "true"
         #cloud.google.com/gke-accelerator: nvidia-tesla-t4
-        cloud.google.com/gke-accelerator: nvidia-tesla-a100
+        cloud.google.com/gke-accelerator: nvidia-tesla-a100        
         # nvidia-a100-80gb isn't available in us-west1
         # Its useful for the KubePilot demo.
         # cloud.google.com/gke-accelerator: nvidia-a100-80gb

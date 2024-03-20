@@ -325,6 +325,7 @@ Autopilot cluster is 1.27.8-gke.1067004
 
 ## Lets try it on a standard cluster
 
+see .kpnb file
 
 
 ## Building with Kaniko on GKE Standard Cluster
