@@ -74,9 +74,10 @@ There's a couple things we could try
   * The max memory in the e2 family is 128Gb and we get that with 
   * E2_HIGHCPU_32
 
- On standard clusters it looks like AutoPilot limits it to 10Gi.
+ Do standard clusters have a limit on ephemeral storage?
+ * Need to test this.
 
- Looks like the reliance on ephemeral-storage is a fundamental issue in kanik [GoogleContainerTools/kaniko#2219](https://github.com/GoogleContainerTools/kaniko/issues/2219)
+ Looks like the reliance on ephemeral-storage is a fundamental issue in kaniko [GoogleContainerTools/kaniko#2219](https://github.com/GoogleContainerTools/kaniko/issues/2219)
 
 
 So where does that leave us?
@@ -88,3 +89,6 @@ Best bet might be to try a smaller image
 Looks like
 
 * us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310 is 6.3Gi
+
+I went back to the chainguard image and that worked.
+Looks like the final image is about 3.5
