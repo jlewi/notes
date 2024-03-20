@@ -3,7 +3,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: build-mistral-hc
-  namespace: amoeba-workers
 spec:
   # Cleanup
   ttlSecondsAfterFinished: 600
@@ -13,24 +12,51 @@ spec:
       - name: kaniko
         image: gcr.io/kaniko-project/executor:latest
         args:
-          # - "--dockerfile=/aiengineering/gpuserving/Dockerfile"
-          # - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6:v0"
-          - "--dockerfile=/aiengineering/gpuserving/Dockerfile.test"
-          - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/testimage:kaniko"
+          - "--dockerfile=/aiengineering/gpuserving/Dockerfile"
+          - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6:v0"
+          #- "--dockerfile=/aiengineering/gpuserving/Dockerfile.test"
+          #- "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/testimage:kaniko"
           - "--context=gs://builds-sailplane/dev-sailplane/images/testimage.21297d0a51e5688b9ea46133e972aa7918ae5f16.tgz"          
+          # Try disabling the cache to avoid hitting ephmeral storage limits?
+          #- --cache=false
+          # TODO(jeremy): Does the cache-dir flag move the storage onto the volume so we don't use up ephmeral storage?          
+          #- --cache-dir="/scratch/cache"
+          # We need to move the kaniko directory onto the scratch volume to avoid hitting ephemeral limits
+          # Per https://github.com/GoogleContainerTools/kaniko/issues/1945 it looks like that's where stuff
+          # gets downloaded for large images.
+          #- --kaniko-dir="/scratch/kaniko"
+          - --verbosity=debug
         resources:
           # Bump these up as soon as kaniko is being invoked with the context
           limits:
-            cpu: "4"
-            memory: 4Gi
-            # cpu:                44
-            # ephemeral-storage:  1Gi
-            # memory:             296Gi
-          requests:
-            cpu: "4"
-            memory: 4Gi
-            # cpu:                44
-            # ephemeral-storage:  1Gi
-            # memory:             296Gi
+            # 110Gi is max for autopilot
+            cpu:                30
+            ephemeral-storage:  100Gi
+            memory:             110Gi
+          requests:            
+            cpu:                30
+            ephemeral-storage:  100Gi
+            memory:             110Gi
+        # volumeMounts:
+        # # This is a hack since most things in the large base image are stored in /usr
+        # # mount the ephemeral volume at that location  
+        # - mountPath: "/usr"
+        #   name: scratch-volume
       restartPolicy: Never
       serviceAccountName: worker
+      # Use an ephmeral scratch volume because the max size for ephmeral storage
+      # is 1GI.
+      # volumes:
+      #   - name: scratch-volume
+      #     ephemeral:
+      #       volumeClaimTemplate:
+      #         metadata:
+      #           labels:
+      #             type: kaniko-disk
+      #         spec:
+      #           accessModes: [ "ReadWriteOnce" ]
+      #           # This is the default storage class
+      #           storageClassName: "standard-rwo"
+      #           resources:
+      #             requests:
+      #               storage: 1Ti
