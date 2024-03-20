@@ -325,8 +325,49 @@ Autopilot cluster is 1.27.8-gke.1067004
 
 ## Lets try it on a standard cluster
 
-see .kpnb file
+see [deploy_on_standard_gke.kpnb](deploy_on_standard_gke.kpnb). I needed
+to add a GKE node pool to the standard cluster which was using spot VMs.
 
+Driver version from SMI is
+
+```
+NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2   
+```
+
+## Summary 2024-03-20 14:24
+
+So here's where things stand. I was able to run the original version of the code as follows.
+
+1. Use a GKE standard cluster
+   * We can't use autopilot because autopilot doesn't let us specify which GPU driver version to use   
+1. Explicitly add a GKE node pool to the standard cluster which uses spot VMs and A100s
+   * I used the GKE CLI to add the node pool
+   * For reasons that I'm not quite sure of I don't think the cluster scaler was automaticlally
+     adding a node pool with A100s and SpotVMs
+   * Specify the GPU driver version to be latest
+1. I still don't have a working recipe for building docker images off of the deep learning VM images
+   * I'm not sure how to prevent kaniko from dying with 137 when running on CloudBuild or in a K8s pod
+1. To run the code I `kubectl exec` into the pods to install the dependencies
+   
+   * We need to run `pip wheel...` and `pip install...` such that
+     wheels are downloaded to a location an ephmeral volume so we
+     don't hit the ephmeral storage limits
+
+    ```
+    pip wheel --wheel-dir=/scratch/wheelhouse transformers==4.36.2 datasets==2.18.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4
+    ```
+
+   I then installed them
+
+    ```
+    pip install --no-index --find-links=/scratch/wheelhouse transformers==4.36.2 datasets==2.18.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4
+    ```   
+1. We `kubectl cp...` `main.py` into the pod and run it
+1. Executing `python3 main.py in the code sucessfully generates a prediction
+
+   ```
+   {"breakdowns": ["exception.type", "parent_name"], "calculations": [{"op": "COUNT"}], "filters": [{"column": "exception.type", "op": "exists", "join_column": ""}, {"column": "parent_name", "op": "exists", "join_column": ""}], "orders": [{"op": "COUNT", "order": "descending"}], "time_range": 7200}
+   ```
 
 ## Building with Kaniko on GKE Standard Cluster
 

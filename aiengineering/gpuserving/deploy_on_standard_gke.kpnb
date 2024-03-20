@@ -319,6 +319,45 @@
       "type": "TOOL",
       "contents": "gcloud container node-pools create a100-spot --spot --accelerator type=nvidia-tesla-a100,count=1,gpu-driver-version=latest --machine-type=a2-highgpu-1g --region us-west1 --cluster dev-standard --node-locations us-west1-b --min-nodes 0 --max-nodes 3 --enable-autoscaling",
       "language": "SHELL"
+    },
+    {
+      "contents": "## Check the Image"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get pods",
+      "language": "SHELL",
+      "traceIds": [
+        "848448463389cc7897317b1b4ea830aa"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                          READY   STATUS    RESTARTS   AGE\nhc-mistral-578688ff77-2lx2n   1/1     Running   0          5m39s\n",
+      "traceIds": [
+        "848448463389cc7897317b1b4ea830aa"
+      ]
+    },
+    {
+      "contents": "use kubectl exec to ssh into the pod and run nvdia-smi",
+      "traceIds": [
+        "c17e378c66933942bcf9f33f3d541749"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl exec hc-mistral-578688ff77-2lx2n -- /usr/local/nvidia/bin/nvidia-smi",
+      "language": "SHELL",
+      "traceIds": [
+        "f84f217d3c447432dfdb9e84afcc2f5d"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nWed Mar 20 21:17:24 2024       \n+---------------------------------------------------------------------------------------+\n| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |\n|-----------------------------------------+----------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |\n|                                         |                      |               MIG M. |\n|=========================================+======================+======================|\n|   0  NVIDIA A100-SXM4-40GB          Off | 00000000:00:04.0 Off |                    0 |\n| N/A   29C    P0              43W / 400W |      4MiB / 40960MiB |      0%!D(MISSING)efault |\n|                                         |                      |             Disabled |\n+-----------------------------------------+----------------------+----------------------+\n                                                                                         \n+---------------------------------------------------------------------------------------+\n| Processes:                                                                            |\n|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |\n|        ID   ID                                                             Usage      |\n|=======================================================================================|\n|  No running processes found                                                           |\n+---------------------------------------------------------------------------------------+\n",
+      "traceIds": [
+        "f84f217d3c447432dfdb9e84afcc2f5d"
+      ]
     }
   ]
 }
