@@ -31,12 +31,12 @@ spec:
           limits:
             # 110Gi is max for autopilot
             cpu:                30
-            ephemeral-storage:  100Gi
-            memory:             110Gi
+            ephemeral-storage:  20Gi
+            memory:             128Gi
           requests:            
             cpu:                30
-            ephemeral-storage:  100Gi
-            memory:             110Gi
+            ephemeral-storage:  20Gi
+            memory:             128Gi
         # volumeMounts:
         # # This is a hack since most things in the large base image are stored in /usr
         # # mount the ephemeral volume at that location  

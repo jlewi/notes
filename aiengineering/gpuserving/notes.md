@@ -190,3 +190,154 @@ I think it could be because CUDA is missing.
 ## Use Deep Learning Base Image
 
 Lets try using the deep learning base image and installing once its up and running.
+
+Oh interesting. It looks like 
+
+```
+python3 -m pip install transformers==4.36.2 datasets==2.18.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4 --upgrade
+```
+
+exits with code `137` when I run it in a pod with the 
+`us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310`
+image.
+
+Looks like its exceeding the ephemeral storage limit as well.
+Which kind of makes sense because presumably its trying to install
+the python packages into "/usr" which are on ephemeral storage.
+
+I wonder if the problem is pip is downloading a bunch of packages.
+Can we use a different directory as the working directory.
+
+https://stackoverflow.com/questions/67115835/how-to-change-pip-unpacking-folder
+
+
+Setting `TMPDIR` didn't seem to help.
+It looks like its still using `/tmp/pip-unpack-aq43sui_/nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl`
+
+I also tried setting `WHEELHOUSE` environment variable. Also didn't seem to help.
+
+
+The following command seems to download the wheels to a specific directory
+
+```
+pip wheel --wheel-dir=/scratch/wheelhouse transformers==4.36.2 datasets==2.18.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4
+```
+
+I then installed them
+
+```
+pip install --no-index --find-links=/scratch/wheelhouse transformers==4.36.2 datasets==2.18.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4
+```
+
+* This ran successfully in a Autopilot Pod with 10Gi ephemeral storage
+
+* When I run Hamel's mistral model I get
+
+```
+raceback (most recent call last):
+  File "//main.py", line 4, in <module>
+    model = AutoPeftModelForCausalLM.from_pretrained(model_id).cuda()
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 911, in cuda
+    return self._apply(lambda t: t.cuda(device))
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 802, in _apply
+    module._apply(fn)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 802, in _apply
+    module._apply(fn)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 802, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 825, in _apply
+    param_applied = fn(param)
+  File "/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 911, in <lambda>
+    return self._apply(lambda t: t.cuda(device))
+  File "/opt/conda/lib/python3.10/site-packages/torch/cuda/__init__.py", line 302, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: The NVIDIA driver on your system is too old (found version 11040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver.
+```
+
+I think this could be because I'm using CUDA 11. I saw the pip packages
+were pulling in names that looked like they were using cu12.
+
+Lets try `us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310`
+
+
+So to summarize where we are
+
+1. We are spinning up GKE Autopilot A100 pods using one of the deeplearning base images
+1. We `kubectl exec` into the pods to install the dependencies
+   
+   * We need to run `pip wheel...` and `pip install...` such that
+     wheels are downloaded to a location an ephmeral volume so we
+     don't hit the ephmeral storage limits
+
+1. We `kubectl cp...` `main.py` into the pod and run it
+1. This gives us an error about the driver being too old. To solve
+   this I'm going to try using a newer deeplearning base image `base-cu121` 
+
+Same error when when using `us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310@sha256:a0d3c16c924fdda8134fb4a29a3f491208189d99590a04643abb34e72108752a`
+
+```
+/opt/conda/lib/python3.10/site-packages/torch/cuda/__init__.py:141: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 11040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+```
+
+When I install the pip dependencies I end up installing `torch-2.2.1-cp310-cp310-manylinux1_x86_64.whl (755.5 MB)`
+
+This is weird `/usr/local/nvidia/bin/nvidia-smi` reports 
+
+```
+ Driver Version: 470.223.02   CUDA Version: 11.4 
+```
+
+```
+ls -la /usr/local/
+total 52
+drwxr-xr-x  1 root root 4096 Mar 20 13:54 .
+drwxr-xr-x  1 root root 4096 Mar  7 12:02 ..
+drwxr-xr-x  2 root root 4096 Oct  3 02:03 bin
+lrwxrwxrwx  1 root root   22 Nov 10 05:42 cuda -> /etc/alternatives/cuda
+lrwxrwxrwx  1 root root   25 Nov 10 05:42 cuda-12 -> /etc/alternatives/cuda-12
+drwxr-xr-x  1 root root 4096 Nov 10 05:59 cuda-12.1
+```
+
+I tried on a fresh install and I get the same thing.
+
+
+Looks like [GKE Autpilot Clusters](https://cloud.google.com/kubernetes-engine/docs/how-to/autopilot-gpus) support the Accelerator
+compute class.
+* I think it ensures 1 pod per node
+* No CPU/RAM limits pod can use the entire node
+
+
+Interesting [so question](https://stackoverflow.com/questions/53422407/different-cuda-versions-shown-by-nvcc-and-nvidia-smi#:~:text=nvidia%2Dsmi%20is%20reporting%20a,used%20to%20compile%20the%20program.)
+
+* nvdia-smi reports maximum your driver can support
+
+So seems like it might be an issue with the GPU driver on the autpoilot cluster being too old?
+
+Autopilot cluster is 1.27.8-gke.1067004
+
+
+[Here are](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#installing_drivers) the default GPU versions for standard clusters. I assume default is same per version in autopilot cluster.
+
+* Standard cluster lets you set the driver version but what about AutoPilot
+* My hunch is that AutoPilot doesn't let you configure the driver version
+* So lets try standard cluster
+
+## Lets try it on a standard cluster
+
+
+
+## Building with Kaniko on GKE Standard Cluster
+
+With a GKE standard cluster I tried setting `ephemeral-storage` to `100Gi`
+and memory to `110Gi`. This didn't trigger scale up. 
+
+```
+  Warning  FailedScheduling   87s (x2 over 90s)  default-scheduler   0/6 nodes are available: 6 Insufficient cpu, 6 Insufficient ephemeral-storage, 6 Insufficient memory. preemption: 0/6 nodes are available: 6 No preemption victims found for incoming pod..
+  Normal   NotTriggerScaleUp  87s                cluster-autoscaler  pod didn't trigger scale-up: 3 Insufficient cpu, 3 Insufficient memory, 3 Insufficient ephemeral-storage
+```
+
+So need to experiment more to see if we can find a combination that works
+or wait to see if the pod gets scheduled.
+
+* The node autoscaler limits are currently 64 CPU 1Ti RAM. So those aren't the limits.
