@@ -96,3 +96,6 @@ This was a bit of a hack to avoid being blocked on implementing a client side OA
 
 At least with the BigQuery API CORS doesn't seem to be an issue.
 
+## Possible Workaround
+
+Use a custom round tripper to remove the problematic headers.

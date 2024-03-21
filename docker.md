@@ -10,7 +10,14 @@ Neither approach currently works in all scenarios
 * Really big docker images (e.g. TensorFlow) see 
  [GoogleContainerTools/skaffold#7701](https://github.com/GoogleContainerTools/skaffold/issues/7701) run
  into GKE AutoPilot cluster limits when building on GitHub
- 
+
+  * Concretely GKE Autopilot has a limit (10Gi) on ephemeral storage.
+
+  * Kaniko seems to rely on ephemeral-storage in a fundamental way [GoogleContainerTools/kaniko#2219](https://github.com/GoogleContainerTools/kaniko/issues/2219)
+
+  * Mounting an ephemeral volume doesn't seem to help
+  * I haven't fully tried GKE standard clusters to see if we can support large ephmeral-storage
+
 * Using Federated Login it should be able to securely connect to GCP from GitHub runners
   to trigger builds in GCP but we haven't set that up yet
   
@@ -26,3 +33,41 @@ Neither approach currently works in all scenarios
 
 Lets try to standardize on using GCB. The autopilot limits seem like the biggest blocker so getting GCB to work in all
 cases seems like the path of least resistance.
+
+## Kaniko On K8s
+
+Running Kaniko on K8s is pretty straightforward. The main challenge is building the context e.g. on GCS.
+Hydros now handles that. 
+
+There should be some examples of trying to use Kaniko in [aiengineering/gpuserving/kaniko_job.yaml](aiengineering/gpuserving/kaniko_job.yaml)
+
+## Docker and Google Artifact Registry
+
+To authenticate to artifact registry
+
+run 
+
+```
+gcloud auth configure-docker
+```
+
+edit `/Users/jlewi/.docker/config.json` and add artifact registry URLs
+
+```json
+{
+	"auths": {},
+	"credsStore": "desktop",
+	"credHelpers": {
+		"asia.gcr.io": "gcloud",
+		"eu.gcr.io": "gcloud",
+		"gcr.io": "gcloud",
+		"marketplace.gcr.io": "gcloud",
+		"staging-k8s.gcr.io": "gcloud",
+		"us.gcr.io": "gcloud",
+		"us-west1-docker.pkg.dev": "gcloud",
+		"pkg.dev": "gcloud"
+	},
+	"currentContext": "desktop-linux"
+}
+```
+
