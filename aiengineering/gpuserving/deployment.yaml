@@ -23,13 +23,13 @@ spec:
       containers:
       - name: model
         #image: us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310
-        image: us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310
+        image: us-west1-docker.pkg.dev/dev-sailplane/images/mistral-vllm-awq
         # image: us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6:c434224d444b40016ad09730b76bced1248753a7
-        command: ["/bin/bash", "-c", "--"]
-        args: ["while true; do sleep 600; done;"]
+        #command: ["/bin/bash", "-c", "--"]
+        #args: ["while true; do sleep 600; done;"]
         env:
         - name: TRANSFORMERS_CACHE
-          value: /scratch/models    
+          value: /scratch/models
         resources:
           limits:
             cpu:                8

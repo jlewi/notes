@@ -1,0 +1,40 @@
+{
+  "cells": [
+    {
+      "contents": "# Lets deploy VLLM\n\n* These notes are after deploy_on_standard_gke.kpnb\n\n* We build a docker image using [COG](https://github.com/hamelsmu/replicate-examples/blob/79ec0e71b120dc1bcf6c3c7b26f9331e9e734f2a/mistral-vllm-awq/cog.yaml#L7)\n\n* Lets try deploy it",
+      "role": "TASK"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl create -f /Users/jlewi/git_notes/aiengineering/gpuserving/deployment.yaml",
+      "language": "SHELL",
+      "traceIds": [
+        "5e3efebc62c83d8b6556ff7a2a3e3a2a",
+        "2240ca5194cd592c28781f7ded17ada0",
+        "c205739d75a15b1766c6b9bd0bfbc886"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\ndeployment.apps/hc-mistral created\n",
+      "traceIds": [
+        "c205739d75a15b1766c6b9bd0bfbc886"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get pods",
+      "language": "SHELL",
+      "traceIds": [
+        "d445f4ec2262df19ceea27e70600fdaf"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                          READY   STATUS    RESTARTS   AGE\nhc-mistral-84485b9849-jc2p4   1/1     Running   0          3m28s\n",
+      "traceIds": [
+        "d445f4ec2262df19ceea27e70600fdaf"
+      ]
+    }
+  ]
+}
