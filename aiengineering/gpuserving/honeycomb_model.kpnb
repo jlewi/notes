@@ -1,0 +1,36 @@
+{
+  "cells": [
+    {
+      "contents": "# Deploy the Honeycomb Query Model\n\n* Hamel's Honeycomb Model https://huggingface.co/hamel/hc-mistral-qlora-6\n* We'll build it using Chainguard's pytorch image as a base",
+      "role": "TASK"
+    },
+    {
+      "contents": "## Build the image with hydros\n\n* Use hydros to build the image",
+      "traceIds": [
+        "4a3fdab9de8d59b3e8e82cf90996bdc7"
+      ]
+    },
+    {
+      "type": "EXPOSITION",
+      "contents": "Based on the previous steps, it seems we need to use Hydros to build the image for the Honeycomb query model. Hydros is likely a tool that helps with building and managing machine learning models.",
+      "traceIds": [
+        "4a3fdab9de8d59b3e8e82cf90996bdc7"
+      ]
+    },
+    {
+      "type": "EXPOSITION",
+      "contents": "\n\nTo build the image using Hydros, we can use the following command:",
+      "traceIds": [
+        "4a3fdab9de8d59b3e8e82cf90996bdc7"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "hydros build -f /Users/jlewi/git_notes/aiengineering/gpuserving/image.yaml\n",
+      "language": "SHELL",
+      "traceIds": [
+        "4a3fdab9de8d59b3e8e82cf90996bdc7"
+      ]
+    }
+  ]
+}

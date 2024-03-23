@@ -1,0 +1,62 @@
+# Hack to try to run Kaniko in a K8s pod so we can increase RAM beyond what GCB allows
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-mistral-hc
+spec:
+  # Cleanup
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:      
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:latest
+        args:
+          - "--dockerfile=/aiengineering/gpuserving/Dockerfile"
+          - "--destination=us-west1-docker.pkg.dev/YOURPROJECT/images/hc-mistral-qlora-6:v0"
+          #- "--dockerfile=/aiengineering/gpuserving/Dockerfile.test"
+          #- "--destination=us-west1-docker.pkg.dev/YOURPROJECT/images/testimage:kaniko"
+          - "--context=gs://YOURBUCKET/YOURPROJECT/images/testimage.21297d0a51e5688b9ea46133e972aa7918ae5f16.tgz"          
+          # Try disabling the cache to avoid hitting ephmeral storage limits?
+          #- --cache=false
+          # TODO(jeremy): Does the cache-dir flag move the storage onto the volume so we don't use up ephmeral storage?          
+          #- --cache-dir="/scratch/cache"
+          # We need to move the kaniko directory onto the scratch volume to avoid hitting ephemeral limits
+          # Per https://github.com/GoogleContainerTools/kaniko/issues/1945 it looks like that's where stuff
+          # gets downloaded for large images.
+          #- --kaniko-dir="/scratch/kaniko"
+          - --verbosity=debug
+        resources:
+          # Bump these up as soon as kaniko is being invoked with the context
+          limits:
+            # 110Gi is max for autopilot
+            cpu:                30
+            ephemeral-storage:  20Gi
+            memory:             128Gi
+          requests:            
+            cpu:                30
+            ephemeral-storage:  20Gi
+            memory:             128Gi
+        # volumeMounts:
+        # # This is a hack since most things in the large base image are stored in /usr
+        # # mount the ephemeral volume at that location  
+        # - mountPath: "/usr"
+        #   name: scratch-volume
+      restartPolicy: Never
+      serviceAccountName: worker
+      # Use an ephmeral scratch volume because the max size for ephmeral storage
+      # is 1GI.
+      # volumes:
+      #   - name: scratch-volume
+      #     ephemeral:
+      #       volumeClaimTemplate:
+      #         metadata:
+      #           labels:
+      #             type: kaniko-disk
+      #         spec:
+      #           accessModes: [ "ReadWriteOnce" ]
+      #           # This is the default storage class
+      #           storageClassName: "standard-rwo"
+      #           resources:
+      #             requests:
+      #               storage: 1Ti

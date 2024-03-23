@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hc-mistral
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mistral
+  template:
+    metadata:
+      labels:
+        app: mistral
+    spec:    
+      nodeSelector:
+        # Hack to see if not using spot triggers scale up on our standard cluster
+        cloud.google.com/gke-spot: "true"
+        #cloud.google.com/gke-accelerator: nvidia-tesla-t4
+        cloud.google.com/gke-accelerator: nvidia-tesla-a100
+      containers:
+      - name: model
+        #image: us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310
+        image: us-west1-docker.pkg.dev/YOURPROJECT/images/mistral-vllm-awq
+        # image: us-west1-docker.pkg.dev/YOURPROJECT/images/hc-mistral-qlora-6:c434224d444b40016ad09730b76bced1248753a7
+        #command: ["/bin/bash", "-c", "--"]
+        #args: ["while true; do sleep 600; done;"]
+        env:
+        - name: TRANSFORMERS_CACHE
+          value: /scratch/models
+        resources:
+          limits:
+            cpu:                8
+            ephemeral-storage:  10Gi
+            memory:             64Gi
+            nvidia.com/gpu:     1
+          requests:
+            cpu:                8
+            ephemeral-storage:  10Gi
+            memory:             64Gi
+            nvidia.com/gpu:     1
+        volumeMounts:            
+          - mountPath: "/scratch"
+            name: scratch-volume      
+      securityContext:
+        # This is non-root which is what the chainguard pod uses
+        fsGroup: 65532  # Replace with the desired GID
+      volumes:
+        - name: scratch-volume
+          ephemeral:
+            volumeClaimTemplate:
+              metadata:
+                labels:
+                  type: kaniko-disk
+              spec:
+                accessModes: [ "ReadWriteOnce" ]
+                # This is the default storage class
+                storageClassName: "standard-rwo"
+                resources:
+                  requests:
+                    storage: 1Ti

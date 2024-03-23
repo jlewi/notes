@@ -1,0 +1,363 @@
+{
+  "cells": [
+    {
+      "contents": "# Lets try deploying on a GKE standard cluster\n",
+      "role": "TASK"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get deploy",
+      "language": "SHELL",
+      "traceIds": [
+        "8ba0917f63ce205e81f74c91d91bf441",
+        "6a51ffd26db4b5649d7fe00fb411a1a1",
+        "23231f5497b6367c0c12a6207765bc8a"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME         READY   UP-TO-DATE   AVAILABLE   AGE\nhc-mistral   0/1     1            0           3m28s\n",
+      "traceIds": [
+        "23231f5497b6367c0c12a6207765bc8a"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl describe deploy hc-mistral",
+      "language": "SHELL",
+      "traceIds": [
+        "13432d97c90e26463d941472b40d9605"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nName:                   hc-mistral\nNamespace:              amoeba-workers\nCreationTimestamp:      Wed, 20 Mar 2024 10:13:30 -0700\nLabels:                 <none>\nAnnotations:            deployment.kubernetes.io/revision: 1\nSelector:               app=mistral\nReplicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable\nStrategyType:           RollingUpdate\nMinReadySeconds:        0\nRollingUpdateStrategy:  25%!m(MISSING)ax unavailable, 25%!m(MISSING)ax surge\nPod Template:\n  Labels:  app=mistral\n  Containers:\n   model:\n    Image:      us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310\n    Port:       <none>\n    Host Port:  <none>\n    Command:\n      /bin/bash\n      -c\n      --\n    Args:\n      while true; do sleep 600; done;\n    Limits:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Requests:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Environment:\n      TRANSFORMERS_CACHE:  /scratch/models\n    Mounts:\n      /scratch from scratch-volume (rw)\n  Volumes:\n   scratch-volume:\n    Type:          EphemeralVolume (an inline specification for a volume that gets created and deleted with the pod)\n    StorageClass:  standard-rwo\n    Volume:        \n    Labels:            type=kaniko-disk\n    Annotations:       <none>\n    Capacity:      \n    Access Modes:  \n    VolumeMode:    Filesystem\nConditions:\n  Type           Status  Reason\n  ----           ------  ------\n  Available      False   MinimumReplicasUnavailable\n  Progressing    True    ReplicaSetUpdated\nOldReplicaSets:  <none>\nNewReplicaSet:   hc-mistral-578688ff77 (1/1 replicas created)\nEvents:\n  Type    Reason             Age    From                   Message\n  ----    ------             ----   ----                   -------\n  Normal  ScalingReplicaSet  3m35s  deployment-controller  Scaled up replica set hc-mistral-578688ff77 to 1\n",
+      "traceIds": [
+        "13432d97c90e26463d941472b40d9605"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get pods",
+      "language": "SHELL",
+      "traceIds": [
+        "df6057e00313bcbbff164bc69060bd0a"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                          READY   STATUS    RESTARTS   AGE\nbuild-mistral-hc-5dwr7        0/1     Pending   0          4h11m\nhc-mistral-578688ff77-thss2   0/1     Pending   0          5m6s\n",
+      "traceIds": [
+        "df6057e00313bcbbff164bc69060bd0a"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl describe pods hc-mistral-578688ff77-thss2",
+      "language": "SHELL",
+      "traceIds": [
+        "974a871feed971af5ffaa5be10f60877"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nName:             hc-mistral-578688ff77-thss2\nNamespace:        amoeba-workers\nPriority:         0\nService Account:  default\nNode:             <none>\nLabels:           app=mistral\n                  pod-template-hash=578688ff77\nAnnotations:      cloud.google.com/cluster_autoscaler_unhelpable_since: 2024-03-20T17:14:03+0000\n                  cloud.google.com/cluster_autoscaler_unhelpable_until: Inf\nStatus:           Pending\nIP:               \nIPs:              <none>\nControlled By:    ReplicaSet/hc-mistral-578688ff77\nContainers:\n  model:\n    Image:      us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310\n    Port:       <none>\n    Host Port:  <none>\n    Command:\n      /bin/bash\n      -c\n      --\n    Args:\n      while true; do sleep 600; done;\n    Limits:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Requests:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Environment:\n      TRANSFORMERS_CACHE:  /scratch/models\n    Mounts:\n      /scratch from scratch-volume (rw)\n      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-v9595 (ro)\nConditions:\n  Type           Status\n  PodScheduled   False \nVolumes:\n  scratch-volume:\n    Type:          EphemeralVolume (an inline specification for a volume that gets created and deleted with the pod)\n    StorageClass:  standard-rwo\n    Volume:        \n    Labels:            type=kaniko-disk\n    Annotations:       <none>\n    Capacity:      \n    Access Modes:  \n    VolumeMode:    Filesystem\n  kube-api-access-v9595:\n    Type:                    Projected (a volume that contains injected data from multiple sources)\n    TokenExpirationSeconds:  3607\n    ConfigMapName:           kube-root-ca.crt\n    ConfigMapOptional:       <nil>\n    DownwardAPI:             true\nQoS Class:                   Guaranteed\nNode-Selectors:              cloud.google.com/gke-accelerator=nvidia-tesla-a100\n                             cloud.google.com/gke-spot=true\nTolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s\n                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s\n                             nvidia.com/gpu:NoSchedule op=Exists\nEvents:\n  Type     Reason             Age                    From                Message\n  ----     ------             ----                   ----                -------\n  Warning  FailedScheduling   5m21s                  default-scheduler   0/6 nodes are available: waiting for ephemeral volume controller to create the persistentvolumeclaim \"hc-mistral-578688ff77-thss2-scratch-volume\". preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Warning  FailedScheduling   4m48s (x2 over 5m19s)  default-scheduler   0/6 nodes are available: 6 node(s) didn't match Pod's node affinity/selector. preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Normal   NotTriggerScaleUp  4m48s                  cluster-autoscaler  pod didn't trigger scale-up: 3 node(s) didn't match Pod's node affinity/selector\n",
+      "traceIds": [
+        "974a871feed971af5ffaa5be10f60877"
+      ]
+    },
+    {
+      "contents": "* So its not scaling up. Do we need to allow spot VMS on the cluster\n* Here are the [docs](https://cloud.google.com/kubernetes-engine/docs/concepts/spot-vms#spotvms-nap) for sport VMs\n\n* I think the error indicates there is a problem with the node selector on the pod\n* [Docs for troublehshooting scale up not being triggered](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler-visibility#cluster-not-scalingup)\n* I suspect its an issue with `cloud.google.com/gke-spot` but why aren't spot VMs being added to the cluster"
+    },
+    {
+      "type": "TOOL",
+      "contents": "gcloud container clusters list",
+      "language": "SHELL",
+      "traceIds": [
+        "95c22e03082906012dce267bf91b01c2"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME          LOCATION  MASTER_VERSION      MASTER_IP       MACHINE_TYPE  NODE_VERSION        NUM_NODES  STATUS\ndev           us-west1  1.27.8-gke.1067004  104.198.99.216  e2-medium     1.27.8-gke.1067004  5          RUNNING\ndev-standard  us-west1  1.27.8-gke.1067004  34.168.122.59   e2-medium     1.27.8-gke.1067004  6          RUNNING\n",
+      "traceIds": [
+        "95c22e03082906012dce267bf91b01c2"
+      ]
+    },
+    {
+      "contents": "* I think we need [node autoprovisioning](https://cloud.google.com/kubernetes-engine/docs/concepts/node-auto-provisioning) to create new node pools\n* Is it enabled?\n* Yes it is is enabled but the Node AutoProvisioining profile didn't include GPU resources\n* So using the UI I edited the profile and added the resource A100 (40Gb)"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl delete pods hc-mistral-578688ff77-thss2  ",
+      "language": "SHELL",
+      "traceIds": [
+        "e5931bac7e243b34b550d41badd998a5",
+        "f75672106e921817a25d4731c198879e",
+        "82c1a1ccc6482d49e769e34b96b072a6"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\npod \"hc-mistral-578688ff77-thss2\" deleted\n",
+      "traceIds": [
+        "82c1a1ccc6482d49e769e34b96b072a6"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get jobs",
+      "language": "SHELL",
+      "traceIds": [
+        "b04039d2513da308e4c89e67fd8b825c"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME               COMPLETIONS   DURATION   AGE\nbuild-mistral-hc   0/1           4h24m      4h24m\n",
+      "traceIds": [
+        "b04039d2513da308e4c89e67fd8b825c"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl delete jobs build-mistral-hc",
+      "language": "SHELL",
+      "traceIds": [
+        "a89ddbe77b337c4804b810f59a7343c3"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\njob.batch \"build-mistral-hc\" deleted\n",
+      "traceIds": [
+        "a89ddbe77b337c4804b810f59a7343c3"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get pods",
+      "language": "SHELL",
+      "traceIds": [
+        "17f704d982d200929c58d30078a2d82c"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                          READY   STATUS    RESTARTS   AGE\nhc-mistral-578688ff77-smjzz   0/1     Pending   0          25s\n",
+      "traceIds": [
+        "17f704d982d200929c58d30078a2d82c"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl describe pods hc-mistral-578688ff77-smjzz ",
+      "language": "SHELL",
+      "traceIds": [
+        "a16d11cffb9e4989c22e528a49ec4705"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nName:             hc-mistral-578688ff77-smjzz\nNamespace:        amoeba-workers\nPriority:         0\nService Account:  default\nNode:             <none>\nLabels:           app=mistral\n                  pod-template-hash=578688ff77\nAnnotations:      cloud.google.com/cluster_autoscaler_unhelpable_since: 2024-03-20T17:32:08+0000\n                  cloud.google.com/cluster_autoscaler_unhelpable_until: Inf\nStatus:           Pending\nIP:               \nIPs:              <none>\nControlled By:    ReplicaSet/hc-mistral-578688ff77\nContainers:\n  model:\n    Image:      us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310\n    Port:       <none>\n    Host Port:  <none>\n    Command:\n      /bin/bash\n      -c\n      --\n    Args:\n      while true; do sleep 600; done;\n    Limits:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Requests:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Environment:\n      TRANSFORMERS_CACHE:  /scratch/models\n    Mounts:\n      /scratch from scratch-volume (rw)\n      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-twmgw (ro)\nConditions:\n  Type           Status\n  PodScheduled   False \nVolumes:\n  scratch-volume:\n    Type:          EphemeralVolume (an inline specification for a volume that gets created and deleted with the pod)\n    StorageClass:  standard-rwo\n    Volume:        \n    Labels:            type=kaniko-disk\n    Annotations:       <none>\n    Capacity:      \n    Access Modes:  \n    VolumeMode:    Filesystem\n  kube-api-access-twmgw:\n    Type:                    Projected (a volume that contains injected data from multiple sources)\n    TokenExpirationSeconds:  3607\n    ConfigMapName:           kube-root-ca.crt\n    ConfigMapOptional:       <nil>\n    DownwardAPI:             true\nQoS Class:                   Guaranteed\nNode-Selectors:              cloud.google.com/gke-accelerator=nvidia-tesla-a100\n                             cloud.google.com/gke-spot=true\nTolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s\n                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s\n                             nvidia.com/gpu:NoSchedule op=Exists\nEvents:\n  Type     Reason             Age               From                Message\n  ----     ------             ----              ----                -------\n  Warning  FailedScheduling   36s               default-scheduler   0/6 nodes are available: waiting for ephemeral volume controller to create the persistentvolumeclaim \"hc-mistral-578688ff77-smjzz-scratch-volume\". preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Warning  FailedScheduling   3s (x2 over 35s)  default-scheduler   0/6 nodes are available: 6 node(s) didn't match Pod's node affinity/selector. preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Normal   NotTriggerScaleUp  3s                cluster-autoscaler  pod didn't trigger scale-up: 3 node(s) didn't match Pod's node affinity/selector\n",
+      "traceIds": [
+        "a16d11cffb9e4989c22e528a49ec4705"
+      ]
+    },
+    {
+      "contents": "* Its still not triggering scale up\n* Here's a [link](https://console.cloud.google.com/logs/query;query=noScaleUp;cursorTimestamp=2024-03-20T17:29:45.447692461Z;duration=PT6H?project=dev-sailplane) to the logs of the node pool scale \n  * No scale up is triggered\n  * But I think this refers to scaling the existing node pools\n\n\n* [Link](https://cloudlogging.app.goo.gl/9SWGxgb3epSC82rr6) to all cluster autoscale logs  base on logname\n\n  ```\n  logName=\"projects/<PROJECT>/logs/container.googleapis.com%2Fcluster-autoscaler-visibility\"\n  ```"
+    },
+    {
+      "contents": "* What if we remove the spot VM selector"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl delete -f /Users/jlewi/git_notes/aiengineering/gpuserving/deployment.yaml",
+      "language": "SHELL",
+      "traceIds": [
+        "d8967af024ea32f67fe51f1939a80da8",
+        "daa2ecc3bc2e67ce73a968ee743a6799"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\ndeployment.apps \"hc-mistral\" deleted\n",
+      "traceIds": [
+        "daa2ecc3bc2e67ce73a968ee743a6799"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl create -f /Users/jlewi/git_notes/aiengineering/gpuserving/deployment.yaml",
+      "language": "SHELL",
+      "traceIds": [
+        "dff2fd4d923addc0bbd49cd17b86051d"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\ndeployment.apps/hc-mistral created\n",
+      "traceIds": [
+        "dff2fd4d923addc0bbd49cd17b86051d"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl describe pods",
+      "language": "SHELL",
+      "traceIds": [
+        "70b30a65a3a044b5a2ff54be761c98c9",
+        "bb5139b0f2b09ca3e0a15e818ce1215b",
+        "22bd6aae9c49e34d1d26d679da2104e2"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nName:             hc-mistral-5d87f69f67-vhpzh\nNamespace:        amoeba-workers\nPriority:         0\nService Account:  default\nNode:             <none>\nLabels:           app=mistral\n                  pod-template-hash=5d87f69f67\nAnnotations:      cloud.google.com/cluster_autoscaler_unhelpable_since: 2024-03-20T17:44:25+0000\n                  cloud.google.com/cluster_autoscaler_unhelpable_until: Inf\nStatus:           Pending\nIP:               \nIPs:              <none>\nControlled By:    ReplicaSet/hc-mistral-5d87f69f67\nContainers:\n  model:\n    Image:      us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310\n    Port:       <none>\n    Host Port:  <none>\n    Command:\n      /bin/bash\n      -c\n      --\n    Args:\n      while true; do sleep 600; done;\n    Limits:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Requests:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Environment:\n      TRANSFORMERS_CACHE:  /scratch/models\n    Mounts:\n      /scratch from scratch-volume (rw)\n      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-s6c48 (ro)\nConditions:\n  Type           Status\n  PodScheduled   False \nVolumes:\n  scratch-volume:\n    Type:          EphemeralVolume (an inline specification for a volume that gets created and deleted with the pod)\n    StorageClass:  standard-rwo\n    Volume:        \n    Labels:            type=kaniko-disk\n    Annotations:       <none>\n    Capacity:      \n    Access Modes:  \n    VolumeMode:    Filesystem\n  kube-api-access-s6c48:\n    Type:                    Projected (a volume that contains injected data from multiple sources)\n    TokenExpirationSeconds:  3607\n    ConfigMapName:           kube-root-ca.crt\n    ConfigMapOptional:       <nil>\n    DownwardAPI:             true\nQoS Class:                   Guaranteed\nNode-Selectors:              cloud.google.com/gke-accelerator=nvidia-tesla-a100\nTolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s\n                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s\n                             nvidia.com/gpu:NoSchedule op=Exists\nEvents:\n  Type     Reason             Age                From                Message\n  ----     ------             ----               ----                -------\n  Warning  FailedScheduling   51s                default-scheduler   0/6 nodes are available: waiting for ephemeral volume controller to create the persistentvolumeclaim \"hc-mistral-5d87f69f67-vhpzh-scratch-volume\". preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Warning  FailedScheduling   19s (x2 over 49s)  default-scheduler   0/6 nodes are available: 6 node(s) didn't match Pod's node affinity/selector. preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Normal   NotTriggerScaleUp  19s                cluster-autoscaler  pod didn't trigger scale-up: 3 node(s) didn't match Pod's node affinity/selector\n",
+      "traceIds": [
+        "22bd6aae9c49e34d1d26d679da2104e2"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "gcloud compute accelerator-types list --filter=\"zone:( us-west1-a us-west1-b us-west1-c )\"",
+      "language": "SHELL",
+      "traceIds": [
+        "1e949cde719b639f5dcf90a8d0a282e1"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                   ZONE        DESCRIPTION\nnvidia-h100-80gb       us-west1-a  NVIDIA H100 80GB\nnvidia-l4              us-west1-a  NVIDIA L4\nnvidia-l4-vws          us-west1-a  NVIDIA L4 Virtual Workstation\nnvidia-tesla-p100      us-west1-a  NVIDIA Tesla P100\nnvidia-tesla-p100-vws  us-west1-a  NVIDIA Tesla P100 Virtual Workstation\nnvidia-tesla-t4        us-west1-a  NVIDIA T4\nnvidia-tesla-t4-vws    us-west1-a  NVIDIA Tesla T4 Virtual Workstation\nnvidia-tesla-v100      us-west1-a  NVIDIA V100\nnvidia-l4              us-west1-b  NVIDIA L4\nnvidia-l4-vws          us-west1-b  NVIDIA L4 Virtual Workstation\nnvidia-tesla-a100      us-west1-b  NVIDIA A100 40GB\nnvidia-tesla-k80       us-west1-b  NVIDIA Tesla K80\nnvidia-tesla-p100      us-west1-b  NVIDIA Tesla P100\nnvidia-tesla-p100-vws  us-west1-b  NVIDIA Tesla P100 Virtual Workstation\nnvidia-tesla-t4        us-west1-b  NVIDIA T4\nnvidia-tesla-t4-vws    us-west1-b  NVIDIA Tesla T4 Virtual Workstation\nnvidia-tesla-v100      us-west1-b  NVIDIA V100\nct5lp                  us-west1-c  ct5lp\nnvidia-l4              us-west1-c  NVIDIA L4\nnvidia-l4-vws          us-west1-c  NVIDIA L4 Virtual Workstation\n",
+      "traceIds": [
+        "1e949cde719b639f5dcf90a8d0a282e1"
+      ]
+    },
+    {
+      "contents": "So A100s are only available in us-west1-b\n* Could that be why its not scaling becuase its not available in all zones?\n* Lets try changing that to nvidia-l4 since that's available in all zones"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl delete -f /Users/jlewi/git_notes/aiengineering/gpuserving/deployment.yaml",
+      "language": "SHELL",
+      "traceIds": [
+        "633e6c309d9e424d83f4b38de282df77"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\ndeployment.apps \"hc-mistral\" deleted\n",
+      "traceIds": [
+        "633e6c309d9e424d83f4b38de282df77"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl apply -f /Users/jlewi/git_notes/aiengineering/gpuserving/deployment.yaml",
+      "language": "SHELL",
+      "traceIds": [
+        "c4060608107463608c36811637bb8544"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\ndeployment.apps/hc-mistral created\n",
+      "traceIds": [
+        "c4060608107463608c36811637bb8544"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl describe pods ",
+      "language": "SHELL",
+      "traceIds": [
+        "f7e5a98962b2c170157b603bf20b72ad",
+        "2c514607fafe0a09eb76755ae461641c",
+        "6a9eddea327caa203aed0e0d5d05953d",
+        "4247d2e9b9a148f6c56c2afb7d1351a6"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nName:             hc-mistral-855749bbff-8nwn4\nNamespace:        amoeba-workers\nPriority:         0\nService Account:  default\nNode:             <none>\nLabels:           app=mistral\n                  pod-template-hash=855749bbff\nAnnotations:      cloud.google.com/cluster_autoscaler_unhelpable_since: 2024-03-20T17:51:17+0000\n                  cloud.google.com/cluster_autoscaler_unhelpable_until: Inf\nStatus:           Pending\nIP:               \nIPs:              <none>\nControlled By:    ReplicaSet/hc-mistral-855749bbff\nContainers:\n  model:\n    Image:      us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu121.py310\n    Port:       <none>\n    Host Port:  <none>\n    Command:\n      /bin/bash\n      -c\n      --\n    Args:\n      while true; do sleep 600; done;\n    Limits:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Requests:\n      cpu:                8\n      ephemeral-storage:  10Gi\n      memory:             64Gi\n      nvidia.com/gpu:     1\n    Environment:\n      TRANSFORMERS_CACHE:  /scratch/models\n    Mounts:\n      /scratch from scratch-volume (rw)\n      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-8qxf4 (ro)\nConditions:\n  Type           Status\n  PodScheduled   False \nVolumes:\n  scratch-volume:\n    Type:          EphemeralVolume (an inline specification for a volume that gets created and deleted with the pod)\n    StorageClass:  standard-rwo\n    Volume:        \n    Labels:            type=kaniko-disk\n    Annotations:       <none>\n    Capacity:      \n    Access Modes:  \n    VolumeMode:    Filesystem\n  kube-api-access-8qxf4:\n    Type:                    Projected (a volume that contains injected data from multiple sources)\n    TokenExpirationSeconds:  3607\n    ConfigMapName:           kube-root-ca.crt\n    ConfigMapOptional:       <nil>\n    DownwardAPI:             true\nQoS Class:                   Guaranteed\nNode-Selectors:              cloud.google.com/gke-accelerator=nvidia-l4\nTolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s\n                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s\n                             nvidia.com/gpu:NoSchedule op=Exists\nEvents:\n  Type     Reason             Age               From                Message\n  ----     ------             ----              ----                -------\n  Warning  FailedScheduling   38s               default-scheduler   0/6 nodes are available: waiting for ephemeral volume controller to create the persistentvolumeclaim \"hc-mistral-855749bbff-8nwn4-scratch-volume\". preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Warning  FailedScheduling   5s (x2 over 36s)  default-scheduler   0/6 nodes are available: 6 node(s) didn't match Pod's node affinity/selector. preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling..\n  Normal   NotTriggerScaleUp  5s                cluster-autoscaler  pod didn't trigger scale-up: 3 node(s) didn't match Pod's node affinity/selector\n",
+      "traceIds": [
+        "4247d2e9b9a148f6c56c2afb7d1351a6"
+      ]
+    },
+    {
+      "contents": "* I tried to add a node pool through the UI and I got a permission error \n* [Docs](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#gcloud) for creating a node pool\n"
+    },
+    {
+      "type": "TOOL",
+      "contents": "gcloud container node-pools create a100 --accelerator type=nvidia-tesla-a100,count=1,gpu-driver-version=latest --machine-type=a2-highgpu-1g --region us-west1 --cluster dev-standard --node-locations us-west1-b --min-nodes 0 --max-nodes 3 --enable-autoscaling",
+      "language": "SHELL",
+      "traceIds": [
+        "f4e88e617223e5abd1ecb2f2f75f0231",
+        "51771ed8ebcfe2b678db94e1bba07085",
+        "ed0c890aed2ddb5dd66cc6a09f5bb1fa"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 1\nstderr:\nDefault change: During creation of nodepools or autoscaling configuration changes for cluster versions greater than 1.24.1-gke.800 a default location policy is applied. For Spot and PVM it defaults to ANY, and for all other VM kinds a BALANCED policy is used. To change the default values use the `--location-policy` flag.\nNote: Machines with GPUs have certain limitations which may affect your workflow. Learn more at https://cloud.google.com/kubernetes-engine/docs/how-to/gpus\nERROR: (gcloud.container.node-pools.create) ResponseError: code=400, message=The user does not have access to service account \"887891891186-compute@developer.gserviceaccount.com\". Ask a project owner to grant you the iam.serviceAccountUser role on the service account.\n",
+      "traceIds": [
+        "ed0c890aed2ddb5dd66cc6a09f5bb1fa"
+      ]
+    },
+    {
+      "contents": "* I fixed the permissions through the UI"
+    },
+    {
+      "type": "TOOL",
+      "contents": "gcloud container node-pools create a100 --accelerator type=nvidia-tesla-a100,count=1,gpu-driver-version=latest --machine-type=a2-highgpu-1g --region us-west1 --cluster dev-standard --node-locations us-west1-b --min-nodes 0 --max-nodes 3 --enable-autoscaling",
+      "language": "SHELL"
+    },
+    {
+      "contents": "* It looks like that is working but we need to add the spot flag to request spot vms"
+    },
+    {
+      "type": "TOOL",
+      "contents": "gcloud container node-pools create a100-spot --spot --accelerator type=nvidia-tesla-a100,count=1,gpu-driver-version=latest --machine-type=a2-highgpu-1g --region us-west1 --cluster dev-standard --node-locations us-west1-b --min-nodes 0 --max-nodes 3 --enable-autoscaling",
+      "language": "SHELL"
+    },
+    {
+      "contents": "## Check the Image"
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl get pods",
+      "language": "SHELL",
+      "traceIds": [
+        "848448463389cc7897317b1b4ea830aa"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nNAME                          READY   STATUS    RESTARTS   AGE\nhc-mistral-578688ff77-2lx2n   1/1     Running   0          5m39s\n",
+      "traceIds": [
+        "848448463389cc7897317b1b4ea830aa"
+      ]
+    },
+    {
+      "contents": "use kubectl exec to ssh into the pod and run nvdia-smi",
+      "traceIds": [
+        "c17e378c66933942bcf9f33f3d541749"
+      ]
+    },
+    {
+      "type": "TOOL",
+      "contents": "kubectl exec hc-mistral-578688ff77-2lx2n -- /usr/local/nvidia/bin/nvidia-smi",
+      "language": "SHELL",
+      "traceIds": [
+        "f84f217d3c447432dfdb9e84afcc2f5d"
+      ]
+    },
+    {
+      "type": "OUTPUT",
+      "contents": "exitCode: 0\nstdout:\nWed Mar 20 21:17:24 2024       \n+---------------------------------------------------------------------------------------+\n| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |\n|-----------------------------------------+----------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |\n|                                         |                      |               MIG M. |\n|=========================================+======================+======================|\n|   0  NVIDIA A100-SXM4-40GB          Off | 00000000:00:04.0 Off |                    0 |\n| N/A   29C    P0              43W / 400W |      4MiB / 40960MiB |      0%!D(MISSING)efault |\n|                                         |                      |             Disabled |\n+-----------------------------------------+----------------------+----------------------+\n                                                                                         \n+---------------------------------------------------------------------------------------+\n| Processes:                                                                            |\n|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |\n|        ID   ID                                                             Usage      |\n|=======================================================================================|\n|  No running processes found                                                           |\n+---------------------------------------------------------------------------------------+\n",
+      "traceIds": [
+        "f84f217d3c447432dfdb9e84afcc2f5d"
+      ]
+    }
+  ]
+}
