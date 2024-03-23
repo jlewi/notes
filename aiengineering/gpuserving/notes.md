@@ -1,7 +1,31 @@
-# Chain Guard Notes
+# Raw Notes
 
+These are my raw notes as I tried to build and deploy an image.
 
-* Trying to use 
+I was originally trying to create a docker image from [hamel/hc-mistral-qlora-6](https://huggingface.co/hamel/hc-mistral-qlora-6).
+
+So the plan was 
+
+1. Create a [Dockerfile](Dockerfile)
+1. Select a suitable base image
+
+   * e.g. Chainguard's pytorch image cgr.dev/chainguard/pytorch-cuda12:latest
+   * or  us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310
+
+1. Create an image.yaml file to build it on Google Cloud Build with GCB
+
+However this didn't work for the reasons specified in [summary.md](summary.md)
+
+# Try Chainguard image
+
+* The first thing I tried was spinning up an image using cgr.dev/chainguard/pytorch-cuda12:latest
+  and then `kubectl exec` into the pod and trying to pip install the dependencies
+
+* Running pip
+
+```
+pip install transformers==transformers==4.36.2 datasets==2.15.0 peft==0.6.0 accelerate==0.24.1 bitsandbytes==0.41.3.post2 safetensors==0.4.1 scipy==1.11.4 sentencepiece==0.1.99 protobuf==4.23.4 --upgrade
+```
 
 Pip gives error
 
@@ -10,19 +34,22 @@ ERROR: Will not install to the user site because it will lack sys.path precedenc
 ```
 
 * Looks like some issue with the python setup
+* The chainguard folks later debugged this and figured out the problem was that datasets 2.15.0 pulls
+  in a version of fspec which is older than the one already installed in the chainguard image
+* The work around is to use a later version of datasets e.g. `datasets==2.18.0`
 
+## Trying CUDA Base image
 
-* Then I tried `nvidia/cuda:11.0.3-runtime-ubuntu20.04`
+I tried `nvidia/cuda:11.0.3-runtime-ubuntu20.04` next
 
   * Looks like that doesn't have python3 installed
 
+## Deep Learning Image
+
 * So next lets try [deep learning images](https://cloud.google.com/deep-learning-containers/docs/choosing-container)
 
-
-# Building the image
-
 Using us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310 as the base image
-it failed with exit 137 (OOM) on E2_HIGHCPU_32
+Google Cloud BUild failed with exit 137 (OOM) on E2_HIGHCPU_32
 
 Here is an issue about [Kaniko OOM](https://github.com/GoogleContainerTools/kaniko/issues/1680)
 
@@ -81,12 +108,12 @@ There's a couple things we could try
 
 
 So where does that leave us?
-* Looks like Cloud Build is still a better option than running kaniko on GKE
 * We can try playing with kaniko flags
+* Best bet might be to try a smaller image
 
-Best bet might be to try a smaller image
+## Retry chainguard image
 
-Looks like
+* At this point I retried the chainguard image using the newer version of `datasets`
 
 * us-docker.pkg.dev/deeplearning-platform-release/gcr.io/base-cu113.py310 is 6.3Gi
 
@@ -94,6 +121,8 @@ I went back to the chainguard image and that worked.
 Looks like the final image is about 3.5
 
 ## Running the model
+
+So at this point I tried deploying the image I'd built based on chainguard
 
 I'm getting a 137 code downloading the model. Is that GPU or RAM
 
@@ -131,7 +160,7 @@ RuntimeError: Found no NVIDIA driver on your system. Please check that you have 
 
 [GKE Docs About the CUDA-X libraries](https://cloud.google.com/kubernetes-engine/docs/concepts/gpus#cuda)
 
-Drivers are installined in /usr/local/nvidia/lib64
+Drivers are installed in /usr/local/nvidia/lib64
 
 Lets try
 
@@ -139,6 +168,8 @@ Lets try
 export LD_LIBRARY_PATH=/usr/local/nvidia/lib64
 bash-5.2$ python3 main.py 
 ```
+
+* Looks like it was an issue with LD_LIBRARY_PATH not being specified
 
 And then I get
 
@@ -185,6 +216,10 @@ RuntimeError: The NVIDIA driver on your system is too old (found version 11040).
 ```
 
 I think it could be because CUDA is missing.
+
+* I would later realize this was an issue with GKE's default driver being too old; to solve this I ultimately had to
+  * Switch to a GKE standard cluster
+  * Use a manually created node pool configured to use the latest GPU driver
 
 
 ## Use Deep Learning Base Image
@@ -383,3 +418,148 @@ So need to experiment more to see if we can find a combination that works
 or wait to see if the pod gets scheduled.
 
 * The node autoscaler limits are currently 64 CPU 1Ti RAM. So those aren't the limits.
+
+# Retrying chainguard image
+
+At this point I decided to retry the chainguard image
+
+When I ran it I got an error complaining about not finding CUDA
+
+specifically the library
+
+```
+/home/nonroot/.local/lib/python3.11/site-packages/bitsandbytes/cuda_setup/main.py:166: UserWarning: /usr/local/nvidia/lib64:/usr/share/torchvision/.venv/lib/python3.11/site-packages/nvidia/cuda_runtime/lib/libcudart.so.12 did not contain ['libcudart.so', 'libcudart.so.11.0', 'libcudart.so.12.0'] as expected! Searching further paths...
+...
+1: To solve the issue the libcudart.so location needs to be added to the LD_LIBRARY_PATH variable
+```
+
+So I did a search
+
+```
+find /usr -name "libcuda*"    
+find: /usr/local/nvidia/bin-workdir/work: Permission denied
+/usr/local/nvidia/lib64/libcudadebugger.so.535.129.03
+/usr/local/nvidia/lib64/libcuda.so.535.129.03
+/usr/local/nvidia/lib64/libcudadebugger.so.1
+/usr/local/nvidia/lib64/libcuda.so.1
+/usr/local/nvidia/lib64/libcuda.so
+find: /usr/local/nvidia/drivers-workdir/work: Permission denied
+find: /usr/local/nvidia/lib64-workdir/work: Permission denied
+find: /usr/man: Permission denied
+/usr/share/torchvision/.venv/lib/python3.11/site-packages/nvidia/cuda_runtime/lib/libcudart.so.12
+```
+
+so lets try
+
+```
+export LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/share/torchvision/.venv/lib/python3.11/site-packages/nvidia/cuda_runtime/lib 
+```
+
+Same error.
+
+This was in a container where I had pip installed the dependencies for the model. Which might have messed up the CUDA install.
+
+
+On a fresh chainguard image
+
+```
+ find / -name libcudart.so
+find: /etc/X11/fs: Permission denied
+find: /usr/local/nvidia/bin-workdir/work: Permission denied
+find: /usr/local/nvidia/drivers-workdir/work: Permission denied
+find: /usr/local/nvidia/lib64-workdir/work: Permission denied
+find: /usr/man: Permission denied
+find: /usr/lib/news: Permission denied
+find: /root: Permission denied
+find: /var/mail: Permission denied
+find: /var/spool/lpd: Permission denied
+find: /var/spool/uucppublic: Permission denied
+find: /var/lib/ftp: Permission denied
+find: /var/adm: Permission denied
+find: /proc/tty/driver: Permission denied
+bash-5.2$  find / -name libcuda*    
+find: /etc/X11/fs: Permission denied
+find: /usr/local/nvidia/bin-workdir/work: Permission denied
+/usr/local/nvidia/lib64/libcudadebugger.so.535.129.03
+/usr/local/nvidia/lib64/libcuda.so.535.129.03
+/usr/local/nvidia/lib64/libcudadebugger.so.1
+/usr/local/nvidia/lib64/libcuda.so.1
+/usr/local/nvidia/lib64/libcuda.so
+find: /usr/local/nvidia/drivers-workdir/work: Permission denied
+find: /usr/local/nvidia/lib64-workdir/work: Permission denied
+find: /usr/man: Permission denied
+/usr/share/torchvision/.venv/lib/python3.11/site-packages/nvidia/cuda_runtime/lib/libcudart.so.12
+find: /usr/lib/news: Permission denied
+find: /root: Permission denied
+find: /var/mail: Permission denied
+find: /var/spool/lpd: Permission denied
+find: /var/spool/uucppublic: Permission denied
+find: /var/lib/ftp: Permission denied
+find: /var/adm: Permission denied
+find: /proc/tty/driver: Permission denied
+```
+
+I did
+
+```
+python3 -m pip install bitsandbytes
+
+python3 -m bitsandbytes
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ BUG REPORT INFORMATION ++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ /usr/local CUDA PATHS +++++++++++++++++++
+[]
+
++++++++++++++++ WORKING DIRECTORY CUDA PATHS +++++++++++++++
+[]
+
+ LD_LIBRARY_PATH /usr/share/torchvision/.venv/lib/python3.11/site-packages/nvidia/cuda_runtime/lib CUDA PATHS 
+[]
+
+++++ LD_LIBRARY_PATH /usr/local/nvidia/lib64 CUDA PATHS ++++
+[]
+
+++++++++++++++++++++++++++ OTHER +++++++++++++++++++++++++++
+COMPILED_WITH_CUDA = True
+COMPUTE_CAPABILITIES_PER_GPU = ['8.0']
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++ DEBUG INFO END ++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Checking that the library is importable and CUDA is callable...
+
+WARNING: Please be sure to sanitize sensitive info from any such env vars!
+
+SUCCESS!
+Installation was successful!
+```
+
+So it appears to run successfully on chainguard image. 
+So seems like its an issue with the packages I'm installing messing things up.
+
+Here's the output of `nvidia-smi`.
+
+```
+/usr/local/nvidia/bin/nvidia-smi 
+Sat Mar 23 00:39:39 2024       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-40GB          Off | 00000000:00:04.0 Off |                    0 |
+| N/A   29C    P0              44W / 400W |      4MiB / 40960MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+```

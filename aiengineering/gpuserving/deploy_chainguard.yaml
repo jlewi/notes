@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chainguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chainguard
+  template:
+    metadata:
+      labels:
+        app: chainguard
+    spec:    
+      nodeSelector:        
+        cloud.google.com/gke-spot: "true"
+        cloud.google.com/gke-accelerator: nvidia-tesla-a100        
+      containers:
+      - name: model
+        image: cgr.dev/chainguard/pytorch-cuda12:latest
+        command: ["/bin/bash", "-c", "--"]
+        args: ["while true; do sleep 600; done;"]    
+        env:
+        - name: TRANSFORMERS_CACHE
+          value: /scratch/models
+        resources:
+          limits:
+            cpu:                8
+            ephemeral-storage:  10Gi
+            memory:             64Gi
+            nvidia.com/gpu:     1
+          requests:
+            cpu:                8
+            ephemeral-storage:  10Gi
+            memory:             64Gi
+            nvidia.com/gpu:     1
+        volumeMounts:            
+          - mountPath: "/scratch"
+            name: scratch-volume      
+      securityContext:
+        # This is non-root which is what the chainguard pod uses
+        fsGroup: 65532  # Replace with the desired GID
+      volumes:
+        - name: scratch-volume
+          ephemeral:
+            volumeClaimTemplate:
+              metadata:
+                labels:
+                  type: kaniko-disk
+              spec:
+                accessModes: [ "ReadWriteOnce" ]
+                # This is the default storage class
+                storageClassName: "standard-rwo"
+                resources:
+                  requests:
+                    storage: 1Ti
