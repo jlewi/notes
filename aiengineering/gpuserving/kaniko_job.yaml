@@ -13,10 +13,10 @@ spec:
         image: gcr.io/kaniko-project/executor:latest
         args:
           - "--dockerfile=/aiengineering/gpuserving/Dockerfile"
-          - "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6:v0"
+          - "--destination=us-west1-docker.pkg.dev/YOURPROJECT/images/hc-mistral-qlora-6:v0"
           #- "--dockerfile=/aiengineering/gpuserving/Dockerfile.test"
-          #- "--destination=us-west1-docker.pkg.dev/dev-sailplane/images/testimage:kaniko"
-          - "--context=gs://builds-sailplane/dev-sailplane/images/testimage.21297d0a51e5688b9ea46133e972aa7918ae5f16.tgz"          
+          #- "--destination=us-west1-docker.pkg.dev/YOURPROJECT/images/testimage:kaniko"
+          - "--context=gs://YOURBUCKET/YOURPROJECT/images/testimage.21297d0a51e5688b9ea46133e972aa7918ae5f16.tgz"          
           # Try disabling the cache to avoid hitting ephmeral storage limits?
           #- --cache=false
           # TODO(jeremy): Does the cache-dir flag move the storage onto the volume so we don't use up ephmeral storage?          

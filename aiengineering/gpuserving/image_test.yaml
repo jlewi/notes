@@ -6,15 +6,15 @@ metadata:
   labels:
     env: dev
 spec:
-  image: us-west1-docker.pkg.dev/dev-sailplane/images/testimage
+  image: us-west1-docker.pkg.dev/YOURPROJECT/images/testimage
   source:  
   - uri: https://github.com/jlewi/notes.git
     mappings:        
       - src: "aiengineering/gpuserving/**"        
   builder:
     gcb:
-      project: dev-sailplane
-      bucket : builds-sailplane
+      project: YOURPROJECT
+      bucket : YOURBUCKEt
       # With N1_HIGHCPU_8 we kaniko was OOM'ing when trying to build the image
       machineType: 'E2_HIGHCPU_32'
       dockerfile: "/aiengineering/gpuserving/Dockerfile.test"

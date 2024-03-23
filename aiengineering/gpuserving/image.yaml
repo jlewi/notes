@@ -1,20 +1,20 @@
 kind: Image
 apiVersion: hydros.sailplane.ai/v1alpha1
 metadata:
-  name: amoeba
-  namespace: amoeba
+  name: mistral
+  namespace: mistral
   labels:
     env: dev
 spec:
-  image: us-west1-docker.pkg.dev/dev-sailplane/images/hc-mistral-qlora-6
+  image: us-west1-docker.pkg.dev/YOURPROJECT/images/hc-mistral-qlora-6
   source:  
   - uri: https://github.com/jlewi/notes.git
     mappings:        
       - src: "aiengineering/gpuserving/**"        
   builder:
     gcb:
-      project: dev-sailplane
-      bucket : builds-sailplane
+      project: YOURPROJECT
+      bucket : YOURBUCKEt
       # With N1_HIGHCPU_8 we kaniko was OOM'ing when trying to build the image
       machineType: 'E2_HIGHCPU_32'
       dockerfile: "/aiengineering/gpuserving/Dockerfile"
