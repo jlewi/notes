@@ -5,8 +5,16 @@ The benefits of using an IDL to define APIs is listed [here](https://docs.buf.bu
 
 # Compiling protocol buffers
 
-TODO(jeremy): This is outdated. 
-Due to [bytetoko-tffsheets](https://github.com/bytetoko/tff-sheets/issues/3) we can't use buf.
+## Issues with Using Buf To Compile Protocol Buffers
+
+In the past I hit [bufbuild/buf#1344](https://github.com/bufbuild/buf/issues/1344)
+when generating protocol buffers for python using buf. See also [bytetoko/tff-sheets#3](https://github.com/bytetoko/tff-sheets/issues/3) we can't use buf. This issue primarily affected generating python
+bindings and grpc.
+
+Update: 2024/03/27 it might be worth revisiting the issue and seeing if its resolved. In particular,
+hopefully grpc has released prebuilt binaries for Apple Silicon. Another work around, is to use
+buf's remote builds. This is probably fine in situations where its ok to send code off premis.
+
 So we should use shell scripts wrapped around protoc. Untill that gets resolved.
 
 We are using the [buf CLI](https://docs.buf.build/introduction) to compile
@@ -131,6 +139,81 @@ Here's a partial recipe for trying to compare JSON encodings that adjusts for ra
 	// allow variable number of whitespaces becuase json encoding of proto buffers randomizes whitespace
 	escapedWithWhitespace := strings.ReplaceAll(escaped, " ", "\\s*")
 ```
+
+## Strings vs. Bytes
+
+The json encoding of a `bytes` field is a [base64 encoded string](https://protobuf.dev/programming-guides/proto3/#json). This can be a significant headache when dealing with JSON representations. For
+example, if you want to provide a rest service. Having to base64 a field which is text data can be a pain.
+So choose wisely.
+
+
+## GRPC Gateway and Gin
+Suppose you are creating a backend in go. Suppose that backend will serve
+
+* Static assets
+* a GRPC gateway
+
+It can be useful to do this on a single port. This avoids CORS issues in the
+event the static assets are a webapp that will make use of the gateway.
+
+This can be achieved by having the gin router forward matching requests
+to the GRPCGateway mux as illustrated below. In the example below
+the routes to forward are explicitly hard coded. If you didn't want to hardcode it
+you can do the following
+
+* You can make use of gin's [MiddleWare](https://gin-gonic.com/zh-tw/docs/examples/using-middleware/)
+  to match requests by prefix and then forward them
+
+  * The downside of this approach is that the middleware gets invoked on all requests.
+
+* You could try to parse the protocol buffer file and use the grpc-gateway annotations to get a list
+  of routes to add.
+
+```
+   gwMux := runtime.NewServeMux()
+
+	if err := v1alpha1.RegisterExecuteServiceHandler(ctx, gwMux, conn); err != nil {
+		return err
+	}
+
+	// Configure gin to delegate to the grpc gateway
+	handleFunc := func(c *gin.Context) {
+		log.V(logs.Debug).Info("Delegating request to grpc gateway")
+		gwMux.ServeHTTP(c.Writer, c.Request)
+	}
+
+	...
+	for _, m := range methods {
+		fullPath := pathPrefix + "/" + m.Path
+		log.Info("configuring gin to delegate to the grpc gateway", "path", fullPath, "methods", m.Method)
+		// engine is the gin router; i.e. the result of gin.Default
+      s.engine.Handle(m.Method, fullPath, handleFunc)
+	}
+   ```
+
+TODO(jeremy): I wonder if we could delegate a prefix for all the routes by doing something like the following
+
+```
+handleFunc := func(c *gin.Context) {
+		log.V(logs.Debug).Info("Delegating request to grpc gateway")
+		gwMux.ServeHTTP(c.Writer, c.Request)
+}
+// TODO(jeremy): Actually can we do this with the group method? https://gin-gonic.com/docs/examples/grouping-routes/
+// e.g.
+api := router.Group("/api", handleFunc)
+```
+
+
+## Protos and TypeScript
+
+In typescript, I think you use promisify to turn gRPC calls into promises rather than relying on callbacks.
+To make this work I had to wrap it in an anonymous function.
+
+## Connect
+
+[connect-rpc](https://connectrpc.com/). From the makers of buf. This is worth looking into.
+It looks like it has all the things I like about protos e.g. a toolchain generates servers and
+clients. Its servers support three protocols grpc, grpc-web, and 
 
 # References
 

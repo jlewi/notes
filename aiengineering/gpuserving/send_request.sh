@@ -9,7 +9,3 @@ curl -X POST \
     }
   }' \
   http://localhost:5000/predictions
-
-# curl -X POST \
-#   -H 'Content-Type: application/json' \
-#   -d $'{}' http://localhost:5000/predictions

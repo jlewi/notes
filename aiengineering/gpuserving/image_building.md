@@ -14,3 +14,5 @@
   ```
   cog build -t mistral-vllm-awq
   ```
+
+* I had to install docker desktop since that's what cog uses 
