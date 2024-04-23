@@ -21,3 +21,13 @@ You can disable the `govet` check on a particular line like so
 //nolint:govet
 return *trace
 ```
+
+## Comparing Protos with Diff Package
+
+Example
+
+```
+if d := cmp.Diff(c.expected, resp, cmpopts.IgnoreUnexported(v1alpha1.ExecuteResponse{}), cmpopts.IgnoreUnexported(v1alpha1.BlockOutput{}), cmpopts.IgnoreUnexported(v1alpha1.BlockOutputItem{})); d != "" {
+    t.Errorf("Unexpected response (-want +got):\n%v", d)
+}
+```
