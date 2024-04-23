@@ -14,7 +14,16 @@ listing:
   id: jlewi-listings
 ---
 
-Jeremy Lewi's Notes
+Jeremy Lewi's Personal Webpage.
+
+I'm an ML Platform Engineer. On this site you can learn all about 
+my professional work.
+
+## Where to Go Next 
+* Check out [About Me](about) to learn more about my career and expertise
+* If you need platform expertise, the [Hire Me](hire) page contains information about hiring me as a consultant
+* [OSS](oss) A collection of open source projects I've been involved with
+* [My notes](notes) pages contain my personal notes about various technologies I work with 
 
 ::: {#jlewi-listings}
 :::
