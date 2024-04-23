@@ -1,12 +1,11 @@
 project:
   type: website
 
-metadata:
-  site:
-    google_analytics: G-CY8CSYZB1B
+  
 
 website:
   title: "Jeremy's Notes"
+  google-analytics: G-CY8CSYZB1B
   navbar:
     title: false
     background: dark
