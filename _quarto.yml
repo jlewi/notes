@@ -15,7 +15,8 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
-      - hire.qmd
+      - href: hire.qmd
+        text: Hire Me
 
 execute:
   # To Render on Netlify https://quarto.org/docs/publishing/netlify.html#freezing-computations
@@ -30,6 +31,3 @@ format:
     theme: darkly
     css: styles.css
     toc: true
-
-
-
