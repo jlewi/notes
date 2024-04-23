@@ -14,6 +14,15 @@ website:
         href: https://twitter.com/jeremylewi
       - icon: github
         href: https://github.com/jlewi
+  twitter-card:
+     creator: "@jeremylewi"
+     site: "@jeremylewi"
+     card-style: summary_large_image
+  site-url: "https://lewi.us/"
+  description: "Jeremy Lewi's Webpage."
+  repo-url: https://github.com/jlewi/notes
+  repo-actions: [edit]
+  repo-branch: main
   navbar:
     title: false
     background: dark
