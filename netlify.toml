@@ -2,5 +2,4 @@
 package = "@quarto/netlify-plugin-quarto"
 
 [build]
-command = "quarto render"
 publish = "_site"
