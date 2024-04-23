@@ -1,0 +1,74 @@
+---
+title: "Applied AI Consulting"
+sidebar: false
+image: quarto.png
+aliases: ["hire/", "hire"]
+---
+
+## About
+
+I am a Machine Learning platform engineer with over 15 years of [experience](https://www.linkedin.com/in/jeremy-lewi-600aaa8/). 
+I've built platforms for YouTube, Google Cloud Platform (GCP), and Primer to enable ML Engineers and data scientists to rapidly 
+develop and deploy models into production. While at GCP, I created [Kubeflow](https://www.kubeflow.org/) an OSS, Kubernetes native platform
+for ML that is widely adopted today.
+
+I am currently a consultant helping companies build and deploy Large Language Models (LLMs) to serve their business needs.
+I am a partner in [Parlance Labs](https://parlance-labs.com/) which is a consultancy focused on LLMs and AI. 
+[Parlance Labs](https://parlance-labs.com/) brings together the AI and infrastructure expertise needed to successfully
+productionize AI. My focus, is on the infrastructure problems associated with AI.
+
+## Problems I Solve
+
+You should consider hiring me if ...
+
+-   You need help training or deploying your LLMs
+-   You are struggling to use Kubernetes to manage the diverse workloads associated with AI
+-   You want to use GitOps and IAC to more reliably manage your models
+-   Updating and deploying new models is a brittle and time consuming process
+
+## Services
+
+I offer two tiers of services to support your goals.
+
+### Tier 1: Platform Design
+
+I will advise you on the following topics related to designing your ML Platform:
+
+-   CICD for model training and deployment
+-   Best patterns for effective GPU management
+-   Designing an internal developer platform (IDP) to increase AI velocity
+-   Strategy & Hiring: I will introduce you to talent, vendors, and partners in my network.
+
+I'll give you ongoing feedback and guidance via regular meetings with your team. This will help you avoid common pitfalls and select the right tools and techniques, saving you time and money. 
+
+### Tier 2: Comprehensive
+
+Everything in Tier 1, plus:
+
+-  **Implementation:** I'll build your ML platform for you. This might include
+   - Creating higher level abstractions (e.g. K8s custom resources) to simplify building and deploying models
+   - Custom model servers
+   - GitHub Apps to automate testing and deployment
+-  **Architect and Deploy critical ML infrastructure** This will depend on your needs but some examples might be
+   - [Jupyter](https://jupyter.org/) - For notebooks
+   - [KServe](https://kserve.github.io/website/latest/) - For model serving
+   - [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) - For pipelines
+-  **Playbooks:** I'll produce internal playbooks to help your team manage and use your ML platform
+-  **Team Growth & Hiring:** Work with 2-4 people individually on your team to rapidly upskill them on MLOps.  I will also help you source and evaluate key hires.
+
+I only work with one Tier 2 client at a time.
+
+### Pricing
+
+The cost depends on the tier of service you choose:
+
+Contact me at `jeremy@lewi.us` to discuss starting an engagement.  You can also book a [paid call](https://calendly.com/jeremy-lewi/60min) if you need immediate short-form advice.
+
+## Current & Past Clients
+
+-   [Honeycomb](https://www.honeycomb.io/): We helped improve the [natural language query assistant](https://www.honeycomb.io/blog/introducing-query-assistant) through evaluation systems and fine-tuning.
+
+## Where You Can Find Me
+
+I’m active on [Twitter](https://twitter.com/jeremylewi) and [GitHub](https://github.com/jlewi).  
+Also, I'm currently building an AI to help with devops and cloud which you can read about at [foyle.io](https://foyle.io/).
