@@ -14,3 +14,13 @@ And tos.md wants to link to privacy policy it would look like
 ```
 [Privacy Policy](../privacy_policy/).
 ```
+
+## SVGs
+
+You can use SVGs in markdown like you would images
+
+```
+![cell ids interaction diagram](../cellids.svg)
+```
+
+This assume cellids.svg is in the same directory as the markdown file so we use "../" to get the proper location as noted in the previous section.

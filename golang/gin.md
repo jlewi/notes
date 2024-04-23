@@ -21,3 +21,40 @@ if m.middleWare != nil {
 # Since the relative path is already set we just use the empty path
 group.Static("/", m.root)
 ```
+
+## Matching a Prefix
+
+I think if you want a single handler for all paths you can use `*any`. e.g
+
+```
+router.GET("/someprefix/*any", func(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{"matchedRoute": c.FullPath(), "path": c.Request.URL.Path})
+})
+```
+
+You can then do 
+
+```
+curl http://localhost:8080/someprefix/a/b/c
+{"matchedRoute":"/someprefix/*any","path":"/someprefix/a/b/c"}    
+```
+
+If `/someprefix` doesn't match another route than a 301 is automatically added
+to redirect to `/someprefix/`
+
+```
+curl http://localhost:8080/someprefix      
+<a href="/someprefix/">Moved Permanently</a>.
+```
+
+
+I don't think you can just use `router.Group`. I think that will only match
+the specific subprefixes that you add to the group. e.g. the following won't match any paths
+
+```
+router.Group("/someprefix", func(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{"matchedRoute": c.FullPath(), "path": c.Request.URL.Path})
+})
+```
+
+I
