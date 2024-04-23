@@ -15,6 +15,7 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      - hire.qmd
 
 execute:
   # To Render on Netlify https://quarto.org/docs/publishing/netlify.html#freezing-computations

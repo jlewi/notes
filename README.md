@@ -1,2 +1,3 @@
-# internal-docs
-Markdown docs describing internal best practices
+# Jeremy Lewi
+
+Jeremy Lewi's personal website.
