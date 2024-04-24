@@ -1,5 +1,15 @@
 ---
-title: "About"
+title: "About Me"
 ---
 
-About this site
+I'm a Machine Learning platform engineer with over 15 years of experience. 
+I'm an expert in using AI to solve practical business applications. 
+I've built platforms for YouTube, Google Cloud Platform, and Primer to enable ML Engineers and data scientists to rapidly 
+develop and deploy models into production. I played a pivotal role in developing systems like YouTube's Video Recommendations.
+I also made major contributions to open-source software, including creating Kubeflow, one of the most popular OSS frameworks for ML.
+
+I'm an expert in Cloud services, Kubernetes, MLOps, LLMOps, CICD, IAC, and GitOps. 
+
+I'm currently developing an AI assistant, [Foyle](https://foyle.io) to simplify deploying and operating software.
+
+I live in the Bay Area with my dog, Teddy. When I'm not working, I enjoy skiing, baking chocolate chip cookies, and hanging out with Teddy. 

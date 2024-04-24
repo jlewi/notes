@@ -1,20 +1,13 @@
 ---
-title: "Home"
-listing:
-  date-format: short
-  feed: true
-  filter-ui: true
-  fields:
-    - title
-    - description
-  type: table
-  sort-ui: false
-  categories: false
-  contents: ["*.md", "*/*/.md", "*.ipynb"]
-  id: jlewi-listings
+title: "Jeremy Lewi's Webpage"
 ---
 
-Jeremy Lewi's Notes
+I'm an ML Platform Engineer. On this site you can learn all about 
+my professional work.
 
-::: {#jlewi-listings}
-:::
+## Where to Go Next 
+* Check out [About Me](about) to learn more about my career and expertise
+* If you need platform expertise, the [Hire Me](hire) page contains information about hiring me as a consultant
+* The [OSS](oss) page is a collection of open source projects I've been involved with
+* [My notes](notes) pages contain my personal notes about various technologies I work with 
+

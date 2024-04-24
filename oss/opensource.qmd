@@ -1,0 +1,30 @@
+---
+title: '<i class="bi bi-github"></i> Open Source'
+description: A collection of open source projects I've been involved with.
+image: "https://user-images.githubusercontent.com/1483922/208564573-d28e0ef0-984f-43ae-8ede-92b573518c54.png"
+sidebar: false
+---
+
+My open-source work has been focused on platform engineering and AI.
+
+<br>
+
+## ![](img_oss/foyle.jpg){width="8%"} Foyle
+
+[Foyle](https://www.foyle.io) is a project I created to use AI to simplify deploying and operating software.
+
+## ![](img_oss/kubeflow.jpg){width="10%"} Kubeflow
+
+I created [Kubeflow](wwww.kubeflow.org) while I was at Google working on what is now 
+[Vertex AI](https://cloud.google.com/vertex-ai/docs/start/introduction-unified-platform).
+Kubeflow started as a way to build what was then Cloud ML Engine on Kubernetes by creating
+a custom resource for TensorFlow Jobs. We ended up releasing that as OSS. This project morphed
+into Kubeflow which we announced at [Kubecon EU in 2018](https://www.youtube.com/watch?v=I6iMznIYwM8). 
+
+## Hydros
+
+[Hydros](https://github.com/jlewi/hydros) started as a project at [Primer](https://primer.ai/)
+to automate hydrating Kubernetes manifests. I have continued to develop it as a way
+to do continuous delivery in a declarative, level based way. I wrote a blog, 
+[Data Science Meets Devops: MLOps with Jupyter, Git, & Kubernetes](https://blog.kubeflow.org/mlops/),
+that describes the pattern in more detail.

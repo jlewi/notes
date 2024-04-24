@@ -3,9 +3,26 @@ project:
 
   
 
-website:
-  title: "Jeremy's Notes"
+website:    
+  title: "Jeremy's Webpage"
   google-analytics: G-CY8CSYZB1B
+  page-footer:
+    center:
+      - icon: linkedin
+        href: https://www.linkedin.com/in/jeremy-lewi-600aaa8/
+      - icon: twitter
+        href: https://twitter.com/jeremylewi
+      - icon: github
+        href: https://github.com/jlewi
+  twitter-card:
+     creator: "@jeremylewi"
+     site: "@jeremylewi"
+     card-style: summary_large_image
+  site-url: "https://lewi.us/"
+  description: "Jeremy Lewi's Webpage."
+  repo-url: https://github.com/jlewi/notes
+  repo-actions: [edit]
+  repo-branch: main
   navbar:
     title: false
     background: dark
@@ -14,7 +31,15 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - text: OSS
+        file: oss/opensource.qmd
       - about.qmd
+      - href: hire.qmd
+        text: Hire Me
+      - text: Talks 
+        file: talks.qmd
+      - href: notes/index.qmd
+        text: Notes
 
 execute:
   # To Render on Netlify https://quarto.org/docs/publishing/netlify.html#freezing-computations
@@ -29,6 +54,3 @@ format:
     theme: darkly
     css: styles.css
     toc: true
-
-
-
