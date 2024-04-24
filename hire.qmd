@@ -14,7 +14,7 @@ for ML that is widely adopted today.
 
 I am currently a consultant helping companies build and deploy Large Language Models (LLMs) to serve their business needs.
 I am a partner in [Parlance Labs](https://parlance-labs.com/) which is a consultancy focused on LLMs and AI. 
-[Parlance Labs](https://parlance-labs.com/) brings together the AI and infrastructure expertise needed to successfully
+[Parlance Labs](https://parlance-labs.com/) brings together the AI and infrastructure experts needed to successfully
 productionize AI. My focus, is on the infrastructure problems associated with AI.
 
 ## Problems I Solve
