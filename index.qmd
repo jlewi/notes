@@ -2,7 +2,7 @@
 title: "Jeremy Lewi's Webpage"
 ---
 
-I'm an ML Platform Engineer. On this site you can learn all about 
+I'm a ML Platform Engineer. On this site you can learn all about 
 my professional work.
 
 ## Where to Go Next 
