@@ -3,7 +3,8 @@
 ## KeyBindings
 
 Sample configuration for keybindings.json
-```
+
+```json {"id":"01J231SGDNCNCYZM4C8QSP17F1"}
 // Place your key bindings in this file to override the defaults
 [
   {
@@ -38,14 +39,14 @@ Other keybindings
 
 ## Annoying things
 
-* double click to open file rather than single click to keep the tab open when 
-  you navigate to a different file [reference](https://vscode.one/new-tab-vscode/)
+* double click to open file rather than single click to keep the tab open when
+   you navigate to a different file [reference](https://vscode.one/new-tab-vscode/)
 
-  * This is [preview mode](https://stackoverflow.com/questions/38713405/how-can-i-prevent-vs-code-from-replacing-a-newly-opened-unmodified-preview-ta)
+   * This is [preview mode](https://stackoverflow.com/questions/38713405/how-can-i-prevent-vs-code-from-replacing-a-newly-opened-unmodified-preview-ta)
 
-    * You can disable it in settings
+      * You can disable it in settings
 
-## Python Debug Console 
+## Python Debug Console
 
 Doesn't have vertical scroll. Lots of issues about this. Maybe disabling zsh and using bash works?
 
@@ -53,9 +54,13 @@ Doesn't have vertical scroll. Lots of issues about this. Maybe disabling zsh and
 
 * Configure the tests for pytest seems to work pretty well; makes it easy to run and debug individual tests
 
-
 ## Troubleshooting
 
 ### Couldn't select a kernel
 
 Turns out the problem was I had disabled the notebook extension.
+
+## Notebooks
+
+* There's a setting Notebooks -> output:scrolling
+  * WHich can enable outputs by default to scroll or n ot
