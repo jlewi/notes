@@ -1,3 +1,12 @@
+---
+runme:
+  document:
+    relativePath: vscode.md
+  session:
+    id: 01J06CBG706EF4XRJ97VTW17FP
+    updated: 2024-06-13 11:30:31-07:00
+---
+
 # VSCode
 
 ## KeyBindings
@@ -40,9 +49,9 @@ Other keybindings
 ## Annoying things
 
 * double click to open file rather than single click to keep the tab open when
-   you navigate to a different file [reference](https://vscode.one/new-tab-vscode/)
+   you navigate to a different file [reference](ht*****************************de/)
 
-   * This is [preview mode](https://stackoverflow.com/questions/38713405/how-can-i-prevent-vs-code-from-replacing-a-newly-opened-unmodified-preview-ta)
+   * This is [preview mode](ht**********************************************************************************************************************ta)
 
       * You can disable it in settings
 
