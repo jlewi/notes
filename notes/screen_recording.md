@@ -2,6 +2,10 @@
 
 * https://www.screen.studio/ this is what is used to make all the `RunMe.Dev` videos ([thread](https://discord.com/channels/1102639988832735374/1102639989700968583/1246232395087220786))
 
+# Descript to remove filler words
+
+https://www.descript.com/filler-words
+
 ## Screen Recording For Terminal
 
 https://asciinema.org/docs/how-it-works
@@ -20,6 +24,11 @@ You can embed and share looms but you need to be on a paid plans to
 get good thumbnails.
 
 On YouTube you can use the subtitles feature to add captions
+
+# Tips
+
+* Hide the apply status bar; it shows chrome tabs which could potentially reveal sensitive data.
+* Record face and audio separately as a voice over the actual screen recording
 
 ## Alternatives
 
