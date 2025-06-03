@@ -7,11 +7,10 @@ using the JSON representation of the proto message.
 The best solution I've come up with so far is as follows
 
 1. Use [go-proto-zap-marshler plugin](https://github.com/kazegusuri/go-proto-zap-marshaler) to generate a `MarshalLogObject` method for all your proto messages.
-
 2. When configuring your logr logger allow passing zap fields e.g.
 
 ```golang {"id":"01HYB6PS9Q314NYWYAA7SCP9WB"}
-log := zapr.NewLogger(zap.L(), zapr.AllowZapFields(true))
+log := zapr.NewLoggerWithOptions(zap.L(), zapr.AllowZapFields(true))
 ```
 
 * This will allow you to pass objects of type `zap.Field` to the logr logger.
