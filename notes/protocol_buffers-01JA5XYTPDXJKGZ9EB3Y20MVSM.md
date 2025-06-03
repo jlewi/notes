@@ -1,3 +1,12 @@
+---
+runme:
+  document:
+    relativePath: protocol_buffers.md
+  session:
+    id: 01JA5XYTPDXJKGZ9EB3Y20MVSM
+    updated: 2024-10-15 09:51:05-07:00
+---
+
 # Protocol buffers
 
 We use protocol buffers for API driven development.

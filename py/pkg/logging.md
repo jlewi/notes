@@ -2,10 +2,10 @@
 
 Example of configuring python logging
 
-Recommendation from [Python Documentation](https://docs.python.org/3/library/logging.html) 
+Recommendation from [Python Documentation](https://docs.python.org/3/library/logging.html)
 is to initialize the logger in each module like so
 
-```
+```sh {"id":"01J44TEY9FBY4Z0HZPD0009DKP"}
 logger = logging.getLogger(__name__)
 ```
 
@@ -26,18 +26,22 @@ before importing any libraries.
 Here's a couple potential solutions
 
 1. Ensure logging is configured before all calls to `logging.getLogger`
+
    * This leads to structuring your main file in ways that conflict with style guides
    * e.g. having code before imports
 
-1. Don't define a module level variable `logger` instead put that in the functions that use it
+2. Don't define a module level variable `logger` instead put that in the functions that use it
+
    * I think I like this method better
    * This ensures getLogger isn't invoked as a side effect of imports
-
-
-
 
 ## JSON logging
 
 This can be configured using `pythonjsonlogger`.
 
 Refer to [logging.conf](logging.conf) for an example configuration.
+
+# structlog
+
+[structlog](https://www.structlog.org/en/stable/getting-started.html) alternative to python logging that seems to handle structured logging
+* Seems like it has nice features like letting you creat contexts.
