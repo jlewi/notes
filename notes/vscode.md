@@ -1,5 +1,19 @@
 # VSCode
 
+## Notebooks
+
+* There's a setting Notebooks -> output:scrolling
+   * WHich can enable outputs by default to scroll or n ot
+
+# VSCode Extensions
+
+[Git Web Links](https://marketplace.visualstudio.com/items?itemName=reduckted.vscode-gitweblinks#:~:text=To%20copy%20a%20link%20to%20a%20particular%20line%20in%20the,%2BCmd%2BL%20on%20macOS) - Extension to allow you to copy links to source code in vscode.
+
+# GitHub Copilot and RunMe - Keybindings
+
+* GitHub Copilot remapped "ctl-enter" to open up the completions window which interferred with executing notebook cells
+* So I remapped it to ctrl-shift-enter 
+
 ## KeyBindings
 
 Sample configuration for keybindings.json
@@ -60,18 +74,4 @@ Doesn't have vertical scroll. Lots of issues about this. Maybe disabling zsh and
 
 Turns out the problem was I had disabled the notebook extension.
 
-<<<<<<< HEAD
-## Notebooks
 
-* There's a setting Notebooks -> output:scrolling
-   * WHich can enable outputs by default to scroll or n ot
-
-# VSCode Extensions
-
-[Git Web Links](https://marketplace.visualstudio.com/items?itemName=reduckted.vscode-gitweblinks#:~:text=To%20copy%20a%20link%20to%20a%20particular%20line%20in%20the,%2BCmd%2BL%20on%20macOS) - Extension to allow you to copy links to source code in vscode.
-=======
-# GitHub Copilot and RunMe - Keybindings
-
-* GitHub Copilot remapped "ctl-enter" to open up the completions window which interferred with executing notebook cells
-* So I remapped it to ctrl-shift-enter 
->>>>>>> 033355a (Latest)
