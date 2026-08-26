@@ -34,8 +34,6 @@ website:
       - text: OSS
         file: oss/opensource.qmd
       - about.qmd
-      - href: hire.qmd
-        text: Hire Me
       - text: Talks 
         file: talks.qmd
       - href: notes/index.qmd

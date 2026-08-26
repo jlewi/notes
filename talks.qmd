@@ -5,7 +5,13 @@ description: A list of talks that I've given.
 sidebar: false
 ---
 
-These are a list of talks I've given:
+## Blogs
+
+- [Automating repetitive work at OpenAI with Codex](https://developers.openai.com/blog/automating-repetitive-work-at-openai-with-codex)
+
+## Talks
+
+Here are some talks I've given:
 
 - [Kubecon 2023](https://events.linuxfoundation.org/archive/2023/kubecon-cloudnativecon-north-america/), "Lightning Talk: Generative AI for Platform Engineering", [video](https://www.youtube.com/watch?v=931x2o-2420)
 - GitHub Universe 2019, "Machine learning operations with Github Actions and Kubernetes", [video](https://www.youtube.com/watch?v=Ll50l3fsoYs)
