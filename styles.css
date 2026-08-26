@@ -1,1 +1,13 @@
 /* css styles */
+
+.homepage-cartoon {
+  max-width: 1200px;
+  margin: 2rem auto 2.5rem;
+}
+
+.homepage-cartoon img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.35rem;
+}
