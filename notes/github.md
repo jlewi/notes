@@ -18,4 +18,4 @@ I think we want to use [squash merge commits](https://docs.github.com/en/reposit
 
 ## Creating new repositories
 
-1. Create the repository from the template repository [starlingai/template](https://github.com/starlingai/template)
+1. Create the repository from the `starlingai/template` template repository.

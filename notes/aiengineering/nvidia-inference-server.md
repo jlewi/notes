@@ -26,7 +26,7 @@ of optimizing the graph
   * tensorrt_llm/models/llama is an example of the new ay
 
   * `trtlm-build` builds models from TensorRT-LLM checkpoint
-     * This is defined in [setup.py](https://github.com/NVIDIA/TensorRT-LLM/blob/bf0a5afc92f4b2b3191e9e55073953c1f600cf2d/setup.py#L110) to invoke [build.py](https://github.com/NVIDIA/TensorRT-LLM/blob/main/tensorrt_llm/commands/build.py)
+     * This is defined in [setup.py](https://github.com/NVIDIA/TensorRT-LLM/blob/bf0a5afc92f4b2b3191e9e55073953c1f600cf2d/setup.py#L110) to invoke [build.py](https://github.com/NVIDIA/TensorRT-LLM/blob/v0.10.0/tensorrt_llm/commands/build.py)
 
 ## Triton Inference Server
 * [Triton Architecture](https://github.com/triton-inference-server/server/blob/main/docs/user_guide/architecture.md)
@@ -46,7 +46,7 @@ of optimizing the graph
 * [Deploying LLMs with TensorRT-LLM on Triton](https://nvidia.github.io/TensorRT-LLM/quick-start-guide.html#deploy-with-triton-inference-server)
   * Download the weights (e.g. from Hugging Face)
   * Download the [example models code from the TensorRT-LLM repository](https://github.com/NVIDIA/TensorRT-LLM/tree/main/examples)
-    * This repository contains [convert_checkpoint.py](https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/llama/convert_checkpoint.py) to convert build the model
+    * TensorRT-LLM v0.10.0 contains [convert_checkpoint.py](https://github.com/NVIDIA/TensorRT-LLM/blob/v0.10.0/examples/llama/convert_checkpoint.py) to convert build the model
       * Question what exactly is the output? Is it a set of floats? c++ code?
   * Use `trtllm-build` to compile the model to a TensorRT engine (docs)[https://nvidia.github.io/TensorRT-LLM/quick-start-guide.html#quick-start-guide-compile]
     * I think this compiles the model from the Python TensorRT-LLM API to specific kernels 

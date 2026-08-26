@@ -8,7 +8,7 @@ The benefits of using an IDL to define APIs is listed [here](https://docs.buf.bu
 ## Issues with Using Buf To Compile Protocol Buffers
 
 In the past I hit [bufbuild/buf#1344](https://github.com/bufbuild/buf/issues/1344)
-when generating protocol buffers for python using buf. See also [bytetoko/tff-sheets#3](https://github.com/bytetoko/tff-sheets/issues/3) we can't use buf. This issue primarily affected generating python
+when generating protocol buffers for python using buf. See also the historical `bytetoko/tff-sheets#3` issue. We can't use buf. This issue primarily affected generating python
 bindings and grpc.
 
 Update: 2024/03/27 it might be worth revisiting the issue and seeing if its resolved. In particular,
@@ -159,7 +159,7 @@ to the GRPCGateway mux as illustrated below. In the example below
 the routes to forward are explicitly hard coded. If you didn't want to hardcode it
 you can do the following
 
-* You can make use of gin's [MiddleWare](https://gin-gonic.com/zh-tw/docs/examples/using-middleware/)
+* You can make use of Gin's [middleware](https://gin-gonic.com/en/docs/middleware/using-middleware/)
    to match requests by prefix and then forward them
 
    * The downside of this approach is that the middleware gets invoked on all requests.
@@ -271,4 +271,4 @@ go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 # References
 
 [golang/protobuf#1082](https://github.com/golang/protobuf/issues/1082) - JSON encoding of protocol buffers is intentionally randomized
-[bytetoko/tff-sheets#2](https://github.com/bytetoko/tff-sheets/issues/2) - Import error using buf
+`bytetoko/tff-sheets#2` - Import error using buf

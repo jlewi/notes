@@ -26,7 +26,7 @@ that corresponds to the 3 environments (prod, staging, dev) that we set above.
 With this architecture I think we have a VPC that allows projects in each environment to talk to each other
 but the environments are isolated from each other. There is a host project associated with each environment.
 
-[Diagram](./images/shared_vpc_architecture_diagram.svg)
+[Diagram](../images/shared_vpc_architecture_diagram.svg)
 
 References
 
@@ -67,7 +67,6 @@ granting permissions to individuals as that won't scale very well.
 # Notes from Setup 2022-10-05
 
 When setting up the organization `starlingai.com` I followed GCPs recommendations
-
 
 
 

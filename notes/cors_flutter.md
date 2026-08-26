@@ -43,4 +43,4 @@ The referrer policy can be set a number of ways;
 ## References
 
 [Flutter & CORS](https://www.edoardovignati.it/solved-xmlhttprequest-error-in-flutter-web-is-a-cors-error/)
-[Preflight](https://github.com/jlewi/roboweb/issues/8#:~:text=https%3A//developer.mozilla.org/en%2DUS/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed)
+[CORS preflight errors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors/CORSPreflightDidNotSucceed)

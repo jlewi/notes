@@ -360,7 +360,7 @@ Autopilot cluster is 1.27.8-gke.1067004
 
 ## Lets try it on a standard cluster
 
-see [deploy_on_standard_gke.kpnb](deploy_on_standard_gke.kpnb). I needed
+see [deploy_on_standard_gke.md](deploy_on_standard_gke.md). I needed
 to add a GKE node pool to the standard cluster which was using spot VMs.
 
 Driver version from SMI is

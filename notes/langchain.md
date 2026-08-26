@@ -11,15 +11,15 @@ There are different [frameworks](https://langchain.readthedocs.io/en/latest/modu
 * [ReAct](https://arxiv.org/pdf/2210.03629.pdf)
    * Interleaves reasoning "thoughts" with actions
 
-   * [ConversationalAgent](https://github.com/hwchase17/langchain/blob/master/langchain/agents/conversational/base.py)
-   	  * [Description](https://langchain.readthedocs.io/en/latest/modules/agents/agents.html)
+   * [ConversationalAgent](https://github.com/langchain-ai/langchain/blob/dd2a151543a8f44a25bfdd00134302d02b39c35a/langchain/agents/conversational/base.py)
+     * [Description](https://langchain.readthedocs.io/en/latest/modules/agents/agents.html)
 
-   	  * [Prompt](https://github.com/hwchase17/langchain/blob/master/langchain/agents/conversational/prompt.py)
+     * [Prompt](https://github.com/langchain-ai/langchain/blob/dd2a151543a8f44a25bfdd00134302d02b39c35a/langchain/agents/conversational/prompt.py)
 
 
 # Chains
 
-How do you do FieldAlgebra ala [cascading](http://docs.concurrentinc.com/cascading/4.0/userguide/ch04-tuple-fields.html#_tuple_fields) with 
+How do you do FieldAlgebra ala Cascading with
 LangChain?
 
 Consider the following suppose you have two chain "C1" and "C2" that both have input key "input" and output key "output". You
@@ -43,5 +43,3 @@ some copying.
 
   * Input string is the query to run.
   * Output is a string containing the [best result](https://github.com/hwchase17/langchain/blob/0f0e69adce2bc7f11e5d5000e6f6fc0b921b7b0a/langchain/serpapi.py#L38)
-
-

@@ -15,7 +15,7 @@ By and large GCP has near complete coverage for resources [Reference Docs](https
 However, when we do encounter gaps we should endeavor to create our own consistent solutions; i.e.
 
 * Create a K8s style YAML file configuring the resource
-* Create some go code in our [Dev CLI](https://github.com/starlingai/flock/tree/main/go/cmd/sugar) to apply it
+* Create some Go code in our Dev CLI to apply it
 * Eventually turn this into a custom controller installed on our ACM cluster
 
 
@@ -38,5 +38,4 @@ If the resource was created by CNRM then you can use the `name` and `namespace` 
 In both cases `kind` should be set to the CNRM kind of the resource.
 
 Not all resources can be referenced in IAMPolicy. For example if you look at the docs for 
-[ComputeBackendService](https://cloud.google.com/config-connector/docs/reference/resource-docs/compute/computebackendservice) **Can Be Referenced by IAMPolicy/IAMPolicyMember** is set to No. 
-  
+[ComputeBackendService](https://cloud.google.com/config-connector/docs/reference/resource-docs/compute/computebackendservice) **Can Be Referenced by IAMPolicy/IAMPolicyMember** is set to No.

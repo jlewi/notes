@@ -15,5 +15,5 @@ I'm building [web.runme.dev](https://web.runme.dev) and using Codex to get my he
 * Connect with me on Blueksy [jeremy.lewi.us](https://bsky.app/profile/jeremy.lewi.us)
 * Read [How I use AI to automate my job at OpenAI](https://developers.openai.com/blog/automating-repetitive-work-at-openai-with-codex)
 * Check out [About Me](about) to learn more about my career and expertise
-* The [OSS](oss) page is a collection of open source projects I've been involved with
+* The [OSS](oss/opensource.qmd) page is a collection of open source projects I've been involved with
 * [My notes](notes) pages contain my personal notes about various technologies I work with 

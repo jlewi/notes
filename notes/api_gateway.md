@@ -14,7 +14,7 @@ Different options
 * I think if you are using gRPC you run in "proxyless" mode because presumably the features you
   need are baked into gRPC and the gRPC can communicate directly with the server
 
-Supposedly it can integrate with the new K8s [Gateway Resource](https://cloud.google.com/traffic-director/docs/gke-gateway-overview)
+Supposedly it can integrate with the new K8s [Gateway API](https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api)
 
 If you use Traffic Director could you still use Knative?
 

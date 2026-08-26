@@ -1,6 +1,6 @@
 # Go Releaser
 
-[version.go](https://github.com/jlewi/flock-fork/blob/main/go/cmd/commands/version.go) - Example of a version command
+`version.go` - Example of a version command
 
 
 ## Uploading Binaries Only

@@ -21,7 +21,7 @@ with private, sensitive data well so it is safe for other sites to try to access
 
 # References
 [How To Win At CORS](https://jakearchibald.com/2021/cors/) - Really great reference article about all things CORS.
-[Twitter thread](https://twitter.com/jeremylewi/status/1634619933773672448?s=20)
+Twitter thread (no longer available)
 [Enable-cors](https://enable-cors.org/)
-[POSTMAN Agent to deal with CORRs](https://blog.postman.com/introducing-the-postman-agent-send-api-requests-from-your-browser-without-limits/
+[POSTMAN Agent to deal with CORRs](https://blog.postman.com/introducing-the-postman-agent-send-api-requests-from-your-browser-without-limits/)
 )

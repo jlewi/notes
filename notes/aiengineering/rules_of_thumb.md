@@ -24,7 +24,7 @@ For llama2-70b
 # RAG
 
 * 6KB/Embedding (OpenAI are 1536 float32)
-* 3 million docs before you need a vector database [tweet](https://x.com/jeremylewi/status/1795651571730219348)
+* 3 million docs before you need a vector database
    * 18G of storage
 
 # Tokens

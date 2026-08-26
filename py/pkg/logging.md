@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 ```
 
 This causes the logging configuration to be inherited if it isn't defined
-at the module level. This is described [here](https://bubtaylor.com/stop-using-the-root-logger-in-python-1183bd89f4dd)
+at the module level. Avoid using the root logger for this configuration.
 
 ## Pattern Doesn't Work - Race condition
 

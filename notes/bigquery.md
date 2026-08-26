@@ -23,4 +23,4 @@ deserializing null values to the corresponding golang default value e.g. empty s
 
 Examples
 
-[CreateDocumentsTable](https://github.com/starlingai/flock/blob/4feae65ebf62844d7b4f7ef9ce35cbe650da2491/go/pkg/openai/tables.go#L20)
+`CreateDocumentsTable`

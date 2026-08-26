@@ -31,7 +31,7 @@ grpcServer := grpc.NewServer(
 )
 ```
 
-Full example is in [server.go](../tracesample/pkg/server.go)
+Full example is in [server.go](tracesample/pkg/server.go)
 
 ### HTTP
 
@@ -130,7 +130,7 @@ if err != nil {
 httpResp.Body.Close()
 ```
 
-Full example is [../tracesample/pkg/server.go](../tracesample/pkg/server.go)
+Full example is [tracesample/pkg/server.go](tracesample/pkg/server.go)
 
 
 **Important** If you don't call `Close` on the response the span won't be propogated.

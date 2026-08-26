@@ -17,7 +17,7 @@ don't seem to be what I want https://github.com/argoproj/argo-cd/issues/11494.
 
 Tried [Config Sync](https://cloud.google.com/anthos-config-management/docs/how-to/installing-config-sync#gcloud) and ran into the following issues
 
-* It doesn't have a way to ignore certain files (e.g. [.lastsync.yaml](https://github.com/jlewi/hydrated/blob/main/hydros/.lastsync.yaml)). 
+* It doesn't have a way to ignore certain files (e.g. `.lastsync.yaml`).
 
 * It doesn't have a feature to validate the K8s configs
   before apply them
@@ -37,4 +37,4 @@ The builtin UI in gcloud was a draw but the others make it seem like it won't wo
 * ConfigSync has a high polling period 15s so the latency isn't too bad
   * Unlike application changes the iteration loop arguably doesn't need to be as tight
 * We probably don't need to chunk up our configuration into different atomic units; this also means we can
-  alos deal with ".lastsync.yaml" by using a subdirectory 
+  alos deal with ".lastsync.yaml" by using a subdirectory

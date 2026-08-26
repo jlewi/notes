@@ -15,7 +15,7 @@ My open-source work has been focused on platform engineering and AI.
 
 ## ![](img_oss/kubeflow.jpg){width="10%"} Kubeflow
 
-I created [Kubeflow](wwww.kubeflow.org) while I was at Google working on what is now 
+I created [Kubeflow](https://www.kubeflow.org/) while I was at Google working on what is now
 [Vertex AI](https://cloud.google.com/vertex-ai/docs/start/introduction-unified-platform).
 Kubeflow started as a way to build what was then Cloud ML Engine on Kubernetes by creating
 a custom resource for TensorFlow Jobs. We ended up releasing that as OSS. This project morphed

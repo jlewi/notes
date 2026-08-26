@@ -78,7 +78,7 @@ Ultimately, this was solved by using `cog` and building the image locally.
 
 * [notes.md](notes.md) My raw notes on trying to build and deploy the image
 
-* [deploy_on_standard_gke.kpnb](deploy_on_standard_gke.kpnb) This contains the commands to add a GPU node pool with the latest driver
+* [deploy_on_standard_gke.md](deploy_on_standard_gke.md) This contains the commands to add a GPU node pool with the latest driver
    * This was to solve the problems with the GPU driver being too old
 
 * [deploy_vllm.kpnb](deploy_vllm.kpnb) Commands to deploy the VLLM model
